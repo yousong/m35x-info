@@ -7615,6 +7615,7 @@ Disassembly of section .data:
 43e015c4:	43e2e9d6 	mvnmi	lr, #3506176	; 0x358000
 43e015c8:	40003800 	andmi	r3, r0, r0, lsl #16
 43e015cc:	43e2e9e3 	mvnmi	lr, #3719168	; 0x38c000
+
 43e015d0:	e92d4010 	push	{r4, lr}
 43e015d4:	eb00988f 	bl	0x43e27818
 43e015d8:	e5d03154 	ldrb	r3, [r0, #340]	; 0x154
@@ -10670,7 +10671,7 @@ Disassembly of section .data:
 43e04580:	128d0014 	addne	r0, sp, #20
 43e04584:	159f161c 	ldrne	r1, [pc, #1564]	; 0x43e04ba8	;; FAILpartition can not be erased
 43e04588:	1a00001f 	bne	0x43e0460c
-43e0458c:	eb008cd6 	bl	0x43e278ec
+43e0458c:	eb008cd6 	bl	<is_system_locked>
 43e04590:	e2504000 	subs	r4, r0, #0
 43e04594:	128d0014 	addne	r0, sp, #20
 43e04598:	159f160c 	ldrne	r1, [pc, #1548]	; 0x43e04bac	;; FAILsystem locked
@@ -10783,7 +10784,7 @@ Disassembly of section .data:
 43e04744:	028d0014 	addeq	r0, sp, #20
 43e04748:	059f1498 	ldreq	r1, [pc, #1176]	; 0x43e04be8	;; FAILno image downloaded
 43e0474c:	0affffae 	beq	0x43e0460c
-43e04750:	eb008c65 	bl	0x43e278ec
+43e04750:	eb008c65 	bl	<is_system_locked>
 43e04754:	e3500000 	cmp	r0, #0
 43e04758:	0a000004 	beq	0x43e04770
 43e0475c:	e59f1448 	ldr	r1, [pc, #1096]	; 0x43e04bac	;; FAILsystem locked
@@ -46673,10 +46674,11 @@ run_command:	e92d4008 	push	{r3, lr}
 43e2780c:	43e3324f 	mvnmi	r3, #-268435452	; 0xf0000004
 43e27810:	43e2e0a4 	mvnmi	lr, #164	; 0xa4
 43e27814:	43e36714 	mvnmi	r6, #20, 14	; 0x500000
-43e27818:	e59f30c0 	ldr	r3, [pc, #192]	; 0x43e278e0
+
+43e27818:	e59f30c0 	ldr	r3, [pc, #192]	; 0x43e278e0	;; r3 = 0x43f74b5c
 43e2781c:	e92d4070 	push	{r4, r5, r6, lr}
-43e27820:	e5934000 	ldr	r4, [r3]
-43e27824:	e3540000 	cmp	r4, #0
+43e27820:	e5934000 	ldr	r4, [r3]						;; r4 = [r3]
+43e27824:	e3540000 	cmp	r4, #0							;; r4 cmp 0
 43e27828:	1a00002a 	bne	0x43e278d8
 43e2782c:	e3a02001 	mov	r2, #1
 43e27830:	e3a00305 	mov	r0, #335544320	; 0x14000000
@@ -46721,12 +46723,13 @@ run_command:	e92d4008 	push	{r3, lr}
 43e278cc:	e5c45155 	strb	r5, [r4, #341]	; 0x155
 43e278d0:	ebffffaa 	bl	0x43e27780
 43e278d4:	e5c40154 	strb	r0, [r4, #340]	; 0x154
-43e278d8:	e59f0008 	ldr	r0, [pc, #8]	; 0x43e278e8
+43e278d8:	e59f0008 	ldr	r0, [pc, #8]	; 0x43e278e8		;; r0 = 0x43e36714, the reason
 43e278dc:	e8bd8070 	pop	{r4, r5, r6, pc}
 43e278e0:	43f74b5c 	mvnsmi	r4, #92, 22	; 0x17000
 43e278e4:	140000a0 	strne	r0, [r0], #-160	; 0xffffff60
 43e278e8:	43e36714 	mvnmi	r6, #20, 14	; 0x500000
-43e278ec:	e92d4030 	push	{r4, r5, lr}
+
+is_system_locked:	e92d4030 	push	{r4, r5, lr}
 43e278f0:	e24ddb01 	sub	sp, sp, #1024	; 0x400
 43e278f4:	e24dd004 	sub	sp, sp, #4
 43e278f8:	ebffffc6 	bl	0x43e27818

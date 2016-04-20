@@ -7563,7 +7563,7 @@ Disassembly of section .data:
 43e014f4:	e92d4070 	push	{r4, r5, r6, lr}
 43e014f8:	e24dd088 	sub	sp, sp, #136	; 0x88
 43e014fc:	e1a06000 	mov	r6, r0
-43e01500:	e1a05001 	mov	r5, r1	;; param
+43e01500:	e1a05001 	mov	r5, r1
 43e01504:	eb0098c3 	bl	0x43e27818
 43e01508:	e5d04154 	ldrb	r4, [r0, #340]	; 0x154
 43e0150c:	e3540000 	cmp	r4, #0
@@ -7660,7 +7660,7 @@ Disassembly of section .data:
 43e01674:	03a02014 	moveq	r2, #20
 43e01678:	159f10cc 	ldrne	r1, [pc, #204]	; 0x43e0174c
 43e0167c:	13a02020 	movne	r2, #32
-43e01680:	eb0084f8 	bl	0x43e22a68
+43e01680:	eb0084f8 	bl	<memcpy>
 43e01684:	ea00002d 	b	0x43e01740
 43e01688:	e59f00c0 	ldr	r0, [pc, #192]	; 0x43e01750
 43e0168c:	e3a04000 	mov	r4, #0
@@ -8330,7 +8330,7 @@ Disassembly of section .data:
 43e020ec:	e1a01008 	mov	r1, r8
 43e020f0:	e5886044 	str	r6, [r8, #68]	; 0x44
 43e020f4:	e5883048 	str	r3, [r8, #72]	; 0x48
-43e020f8:	eb00825a 	bl	0x43e22a68
+43e020f8:	eb00825a 	bl	<memcpy>
 43e020fc:	e1a00006 	mov	r0, r6
 43e02100:	e1a01005 	mov	r1, r5
 43e02104:	e1a02004 	mov	r2, r4
@@ -8380,9 +8380,10 @@ Disassembly of section .data:
 43e021b4:	e0822003 	add	r2, r2, r3
 43e021b8:	e0612002 	rsb	r2, r1, r2
 43e021bc:	ea008016 	b	0x43e2221c
+
 43e021c0:	e92d4038 	push	{r3, r4, r5, lr}
-43e021c4:	e59f4038 	ldr	r4, [pc, #56]	; 0x43e02204
-43e021c8:	e59f3038 	ldr	r3, [pc, #56]	; 0x43e02208
+43e021c4:	e59f4038 	ldr	r4, [pc, #56]	; 0x43e02204, file offset: 0x3eb14
+43e021c8:	e59f3038 	ldr	r3, [pc, #56]	; 0x43e02208, 0x5441000a
 43e021cc:	e5945000 	ldr	r5, [r4]
 43e021d0:	e5853004 	str	r3, [r5, #4]
 43e021d4:	e3a03058 	mov	r3, #88	; 0x58
@@ -8391,7 +8392,7 @@ Disassembly of section .data:
 43e021e0:	e3a02f56 	mov	r2, #344	; 0x158
 43e021e4:	e1a01000 	mov	r1, r0
 43e021e8:	e1a00005 	mov	r0, r5
-43e021ec:	eb00821d 	bl	0x43e22a68
+43e021ec:	eb00821d 	bl	<memcpy>
 43e021f0:	e5943000 	ldr	r3, [r4]
 43e021f4:	e5932000 	ldr	r2, [r3]
 43e021f8:	e0833102 	add	r3, r3, r2, lsl #2
@@ -8399,6 +8400,7 @@ Disassembly of section .data:
 43e02200:	e8bd8038 	pop	{r3, r4, r5, pc}
 43e02204:	43e36f14 	mvnmi	r6, #20, 30	; 0x50
 43e02208:	5441000a 	strbpl	r0, [r1], #-10
+
 43e0220c:	e92d40f8 	push	{r3, r4, r5, r6, r7, lr}
 43e02210:	e1a05000 	mov	r5, r0
 43e02214:	e59f0154 	ldr	r0, [pc, #340]	; 0x43e02370	;; bootargs
@@ -8552,7 +8554,7 @@ Disassembly of section .data:
 43e02464:	e59f1104 	ldr	r1, [pc, #260]	; 0x43e02570
 43e02468:	e28d0008 	add	r0, sp, #8
 43e0246c:	e3a02080 	mov	r2, #128	; 0x80
-43e02470:	eb00817c 	bl	0x43e22a68
+43e02470:	eb00817c 	bl	<memcpy>
 43e02474:	e5943030 	ldr	r3, [r4, #48]	; 0x30
 43e02478:	e594103c 	ldr	r1, [r4, #60]	; 0x3c
 43e0247c:	e5942038 	ldr	r2, [r4, #56]	; 0x38
@@ -8770,19 +8772,22 @@ Disassembly of section .data:
 43e027cc:	e1a00fa0 	lsr	r0, r0, #31
 43e027d0:	e8bd8010 	pop	{r4, pc}
 43e027d4:	43e2eecd 	mvnmi	lr, #3280	; 0xcd0
+
 43e027d8:	e92d44f0 	push	{r4, r5, r6, r7, sl, lr}
+													;; do_bootz
+													;;	bootz_start inlined
 43e027dc:	e24ddd05 	sub	sp, sp, #320	; 0x140
-43e027e0:	e1a05002 	mov	r5, r2	;; IRQs %s FIQs %s Mode %s%s
+43e027e0:	e1a05002 	mov	r5, r2
 43e027e4:	e1a04003 	mov	r4, r3
-43e027e8:	e1a07001 	mov	r7, r1	;; IRQs %s FIQs %s Mode %s%s
-43e027ec:	e1a06000 	mov	r6, r0	;; bootcmd
-43e027f0:	ebfffb76 	bl	0x43e015d0
+43e027e8:	e1a07001 	mov	r7, r1
+43e027ec:	e1a06000 	mov	r6, r0
+43e027f0:	ebfffb76 	bl	0x43e015d0				;; security_check()
 43e027f4:	e3a01000 	mov	r1, #0
 43e027f8:	e3a02f4b 	mov	r2, #300	; 0x12c
 43e027fc:	e28d0014 	add	r0, sp, #20
-43e02800:	eb008072 	bl	0x43e229d0
+43e02800:	eb008072 	bl	0x43e229d0				;; memset(images, 0, 300)
 43e02804:	e28d0014 	add	r0, sp, #20
-43e02808:	ebffffd9 	bl	0x43e02774
+43e02808:	ebffffd9 	bl	0x43e02774				;; boot_start_lmb(images)
 43e0280c:	e3550001 	cmp	r5, #1
 43e02810:	d59f30c4 	ldrle	r3, [pc, #196]	; 0x43e028dc
 43e02814:	d5933000 	ldrle	r3, [r3]
@@ -8808,7 +8813,7 @@ Disassembly of section .data:
 43e02864:	e28d3078 	add	r3, sp, #120	; 0x78
 43e02868:	e28d2014 	add	r2, sp, #20
 43e0286c:	e58d3000 	str	r3, [sp]
-43e02870:	e1a00005 	mov	r0, r5	;; IRQs %s FIQs %s Mode %s%s
+43e02870:	e1a00005 	mov	r0, r5
 43e02874:	e28d307c 	add	r3, sp, #124	; 0x7c
 43e02878:	e1a01004 	mov	r1, r4
 43e0287c:	e58d3004 	str	r3, [sp, #4]
@@ -10102,7 +10107,7 @@ Disassembly of section .data:
 43e03c9c:	e2840010 	add	r0, r4, #16
 43e03ca0:	e3a02028 	mov	r2, #40	; 0x28
 43e03ca4:	e0200392 	mla	r0, r2, r3, r0
-43e03ca8:	eb007b6e 	bl	0x43e22a68
+43e03ca8:	eb007b6e 	bl	<memcpy>
 43e03cac:	e594300c 	ldr	r3, [r4, #12]
 43e03cb0:	e2833001 	add	r3, r3, #1
 43e03cb4:	e584300c 	str	r3, [r4, #12]
@@ -10541,7 +10546,7 @@ Disassembly of section .data:
 43e04378:	e1a00007 	mov	r0, r7
 43e0437c:	e59f17e0 	ldr	r1, [pc, #2016]	; 0x43e04b64	;; reboot
 43e04380:	e3a02006 	mov	r2, #6
-43e04384:	eb0079ed 	bl	0x43e22b40
+43e04384:	eb0079ed 	bl	<memcmp>
 43e04388:	e2504000 	subs	r4, r0, #0
 43e0438c:	1a000026 	bne	0x43e0442c
 43e04390:	e2870006 	add	r0, r7, #6
@@ -10586,7 +10591,7 @@ Disassembly of section .data:
 43e0442c:	e1a00007 	mov	r0, r7
 43e04430:	e59f1740 	ldr	r1, [pc, #1856]	; 0x43e04b78	;; getvar:
 43e04434:	e3a02007 	mov	r2, #7
-43e04438:	eb0079c0 	bl	0x43e22b40
+43e04438:	eb0079c0 	bl	<memcmp>
 43e0443c:	e2509000 	subs	r9, r0, #0
 43e04440:	1a000032 	bne	0x43e04510
 43e04444:	e2877007 	add	r7, r7, #7
@@ -10643,7 +10648,7 @@ Disassembly of section .data:
 43e04510:	e1a00007 	mov	r0, r7
 43e04514:	e59f1678 	ldr	r1, [pc, #1656]	; 0x43e04b94	;; erase:
 43e04518:	e3a02006 	mov	r2, #6
-43e0451c:	eb007987 	bl	0x43e22b40
+43e0451c:	eb007987 	bl	<memcmp>
 43e04520:	e2504000 	subs	r4, r0, #0
 43e04524:	1a00003a 	bne	0x43e04614
 43e04528:	e2870006 	add	r0, r7, #6
@@ -10708,7 +10713,7 @@ Disassembly of section .data:
 43e04614:	e1a00007 	mov	r0, r7
 43e04618:	e59f15a0 	ldr	r1, [pc, #1440]	; 0x43e04bc0	;; download:
 43e0461c:	e3a02009 	mov	r2, #9
-43e04620:	eb007946 	bl	0x43e22b40
+43e04620:	eb007946 	bl	<memcmp>
 43e04624:	e2504000 	subs	r4, r0, #0
 43e04628:	1a00003c 	bne	0x43e04720
 43e0462c:	e3a02010 	mov	r2, #16
@@ -10775,7 +10780,7 @@ Disassembly of section .data:
 43e04720:	e1a00007 	mov	r0, r7
 43e04724:	e59f14b8 	ldr	r1, [pc, #1208]	; 0x43e04be4	;; flash:
 43e04728:	e3a02006 	mov	r2, #6
-43e0472c:	eb007903 	bl	0x43e22b40
+43e0472c:	eb007903 	bl	<memcmp>
 43e04730:	e2505000 	subs	r5, r0, #0
 43e04734:	1a0000d9 	bne	0x43e04aa0
 43e04738:	e59f642c 	ldr	r6, [pc, #1068]	; 0x43e04b6c
@@ -10997,9 +11002,9 @@ Disassembly of section .data:
 43e04a98:	e59f1198 	ldr	r1, [pc, #408]	; 0x43e04c38	;; FAILfailed to flash partition
 43e04a9c:	ea00002c 	b	0x43e04b54
 43e04aa0:	e1a00007 	mov	r0, r7
-43e04aa4:	e59f1190 	ldr	r1, [pc, #400]	; 0x43e04c3c
+43e04aa4:	e59f1190 	ldr	r1, [pc, #400]	; 0x43e04c3c	;; oem
 43e04aa8:	e3a02003 	mov	r2, #3
-43e04aac:	eb007823 	bl	0x43e22b40
+43e04aac:	eb007823 	bl	<memcmp>
 43e04ab0:	e2504000 	subs	r4, r0, #0
 43e04ab4:	13a04001 	movne	r4, #1
 43e04ab8:	1a000011 	bne	0x43e04b04
@@ -12247,7 +12252,7 @@ Disassembly of section .data:
 43e05e24:	e3a0200a 	mov	r2, #10
 43e05e28:	e5950008 	ldr	r0, [r5, #8]
 43e05e2c:	eb007606 	bl	0x43e2364c
-43e05e30:	eb002bb9 	bl	0x43e10d1c
+43e05e30:	eb002bb9 	bl	<find_mmc_device>
 43e05e34:	e1a01006 	mov	r1, r6
 43e05e38:	e3a0200a 	mov	r2, #10
 43e05e3c:	e1a0a000 	mov	sl, r0	;; find failure
@@ -12281,7 +12286,7 @@ Disassembly of section .data:
 43e05eac:	e3a0200a 	mov	r2, #10
 43e05eb0:	e5950008 	ldr	r0, [r5, #8]
 43e05eb4:	eb0075e4 	bl	0x43e2364c
-43e05eb8:	eb002b97 	bl	0x43e10d1c
+43e05eb8:	eb002b97 	bl	<find_mmc_device>
 43e05ebc:	eb003153 	bl	0x43e12410
 43e05ec0:	e2505000 	subs	r5, r0, #0
 43e05ec4:	159f0090 	ldrne	r0, [pc, #144]	; 0x43e05f5c	;; eMMC OPEN Failed.!!
@@ -12304,7 +12309,7 @@ Disassembly of section .data:
 43e05f08:	e3a0200a 	mov	r2, #10
 43e05f0c:	e5950008 	ldr	r0, [r5, #8]
 43e05f10:	eb0075cd 	bl	0x43e2364c
-43e05f14:	eb002b80 	bl	0x43e10d1c
+43e05f14:	eb002b80 	bl	<find_mmc_device>
 43e05f18:	eb003159 	bl	0x43e12484
 43e05f1c:	e2505000 	subs	r5, r0, #0
 43e05f20:	159f0050 	ldrne	r0, [pc, #80]	; 0x43e05f78	;; eMMC CLOSE Failed.!!
@@ -12354,7 +12359,7 @@ Disassembly of section .data:
 43e05fd0:	1a000009 	bne	0x43e05ffc
 43e05fd4:	e59f44a8 	ldr	r4, [pc, #1192]	; 0x43e06484
 43e05fd8:	e5940000 	ldr	r0, [r4]
-43e05fdc:	eb002b4e 	bl	0x43e10d1c
+43e05fdc:	eb002b4e 	bl	<find_mmc_device>
 43e05fe0:	e2503000 	subs	r3, r0, #0
 43e05fe4:	0a00000f 	beq	0x43e06028
 43e05fe8:	e5836034 	str	r6, [r3, #52]	; 0x34
@@ -12370,7 +12375,7 @@ Disassembly of section .data:
 43e06010:	1a000014 	bne	0x43e06068
 43e06014:	e59f4468 	ldr	r4, [pc, #1128]	; 0x43e06484
 43e06018:	e5940000 	ldr	r0, [r4]
-43e0601c:	eb002b3e 	bl	0x43e10d1c
+43e0601c:	eb002b3e 	bl	<find_mmc_device>
 43e06020:	e3500000 	cmp	r0, #0
 43e06024:	1a000002 	bne	0x43e06034
 43e06028:	e59f0464 	ldr	r0, [pc, #1124]	; 0x43e06494	;; no mmc device at slot %x
@@ -12433,7 +12438,7 @@ Disassembly of section .data:
 43e0610c:	ca000061 	bgt	0x43e06298
 43e06110:	e1a04005 	mov	r4, r5
 43e06114:	e1a00004 	mov	r0, r4
-43e06118:	eb002aff 	bl	0x43e10d1c
+43e06118:	eb002aff 	bl	<find_mmc_device>
 43e0611c:	e2505000 	subs	r5, r0, #0
 43e06120:	059f036c 	ldreq	r0, [pc, #876]	; 0x43e06494	;; no mmc device at slot %x
 43e06124:	01a01004 	moveq	r1, r4
@@ -12500,7 +12505,7 @@ Disassembly of section .data:
 43e06218:	e7940103 	ldr	r0, [r4, r3, lsl #2]
 43e0621c:	eb00750a 	bl	0x43e2364c
 43e06220:	e1a07000 	mov	r7, r0	;; mmc%d(part %d) is current device
-43e06224:	eb002abc 	bl	0x43e10d1c
+43e06224:	eb002abc 	bl	<find_mmc_device>
 43e06228:	e59f3254 	ldr	r3, [pc, #596]	; 0x43e06484
 43e0622c:	e35a0003 	cmp	sl, #3
 43e06230:	03a09000 	moveq	r9, #0
@@ -12703,7 +12708,7 @@ Disassembly of section .data:
 43e06544:	eb000c2e 	bl	<puts>
 43e06548:	ea000048 	b	0x43e06670
 43e0654c:	e1a00006 	mov	r0, r6
-43e06550:	eb0029f1 	bl	0x43e10d1c
+43e06550:	eb0029f1 	bl	<find_mmc_device>
 43e06554:	e2504000 	subs	r4, r0, #0
 43e06558:	0a000041 	beq	0x43e06664
 43e0655c:	e3a03000 	mov	r3, #0
@@ -12852,11 +12857,11 @@ Disassembly of section .data:
 43e06798:	e28d1024 	add	r1, sp, #36	; 0x24
 43e0679c:	e5c42006 	strb	r2, [r4, #6]
 43e067a0:	e3a02004 	mov	r2, #4
-43e067a4:	eb0070af 	bl	0x43e22a68
+43e067a4:	eb0070af 	bl	<memcpy>
 43e067a8:	e284000c 	add	r0, r4, #12
 43e067ac:	e28d1028 	add	r1, sp, #40	; 0x28
 43e067b0:	e3a02004 	mov	r2, #4
-43e067b4:	eb0070ab 	bl	0x43e22a68
+43e067b4:	eb0070ab 	bl	<memcpy>
 43e067b8:	e8bd4010 	pop	{r4, lr}
 43e067bc:	e28dd010 	add	sp, sp, #16
 43e067c0:	e12fff1e 	bx	lr
@@ -12870,12 +12875,12 @@ Disassembly of section .data:
 43e067e0:	e281001c 	add	r0, r1, #28
 43e067e4:	e5c13001 	strb	r3, [r1, #1]
 43e067e8:	e2841008 	add	r1, r4, #8
-43e067ec:	eb00709d 	bl	0x43e22a68
+43e067ec:	eb00709d 	bl	<memcpy>
 43e067f0:	e2850020 	add	r0, r5, #32
 43e067f4:	e284100c 	add	r1, r4, #12
 43e067f8:	e3a02004 	mov	r2, #4
 43e067fc:	e8bd4038 	pop	{r3, r4, r5, lr}
-43e06800:	ea007098 	b	0x43e22a68
+43e06800:	ea007098 	b	<memcpy>
 43e06804:	e59f30d8 	ldr	r3, [pc, #216]	; 0x43e068e4
 43e06808:	e92d4ef0 	push	{r4, r5, r6, r7, r9, sl, fp, lr}
 43e0680c:	e1500003 	cmp	r0, r3
@@ -13223,7 +13228,7 @@ Disassembly of section .data:
 43e06d64:	e92d4008 	push	{r3, lr}
 43e06d68:	e1a02001 	mov	r2, r1
 43e06d6c:	eb007236 	bl	0x43e2364c
-43e06d70:	eb0027e9 	bl	0x43e10d1c
+43e06d70:	eb0027e9 	bl	<find_mmc_device>
 43e06d74:	e2503000 	subs	r3, r0, #0
 43e06d78:	1a000003 	bne	0x43e06d8c
 43e06d7c:	e59f001c 	ldr	r0, [pc, #28]	; 0x43e06da0	;; mmc/sd device is NOT founded.
@@ -13242,7 +13247,7 @@ Disassembly of section .data:
 43e06db0:	e1a02001 	mov	r2, r1
 43e06db4:	eb007224 	bl	0x43e2364c
 43e06db8:	e1a05000 	mov	r5, r0	;; mmc/sd device is NOT founded.
-43e06dbc:	eb0027d6 	bl	0x43e10d1c
+43e06dbc:	eb0027d6 	bl	<find_mmc_device>
 43e06dc0:	e3500000 	cmp	r0, #0
 43e06dc4:	1a000003 	bne	0x43e06dd8
 43e06dc8:	e59f0030 	ldr	r0, [pc, #48]	; 0x43e06e00	;; mmc/sd device is NOT founded.
@@ -13267,7 +13272,7 @@ Disassembly of section .data:
 43e06e14:	e1a02001 	mov	r2, r1
 43e06e18:	eb00720b 	bl	0x43e2364c
 43e06e1c:	e1a06000 	mov	r6, r0
-43e06e20:	eb0027bd 	bl	0x43e10d1c
+43e06e20:	eb0027bd 	bl	<find_mmc_device>
 43e06e24:	e2504000 	subs	r4, r0, #0
 43e06e28:	1a000003 	bne	0x43e06e3c
 43e06e2c:	e59f0054 	ldr	r0, [pc, #84]	; 0x43e06e88	;; mmc/sd device is NOT founded.
@@ -13623,7 +13628,7 @@ Disassembly of section .data:
 43e073a4:	eb0070a8 	bl	0x43e2364c
 43e073a8:	e1a07000 	mov	r7, r0
 43e073ac:	e1a00004 	mov	r0, r4
-43e073b0:	eb002659 	bl	0x43e10d1c
+43e073b0:	eb002659 	bl	<find_mmc_device>
 43e073b4:	e1a01009 	mov	r1, r9
 43e073b8:	e28000a8 	add	r0, r0, #168	; 0xa8
 43e073bc:	ebffe7ba 	bl	0x43e012ac
@@ -13968,7 +13973,7 @@ Disassembly of section .data:
 43e07908:	e2855004 	add	r5, r5, #4
 43e0790c:	e3a02004 	mov	r2, #4
 43e07910:	e28d000c 	add	r0, sp, #12
-43e07914:	eb006c53 	bl	0x43e22a68
+43e07914:	eb006c53 	bl	<memcpy>
 43e07918:	e3a00000 	mov	r0, #0
 43e0791c:	e1a01005 	mov	r1, r5	;; ## Warning: defaulting to text format
 43e07920:	e1a02004 	mov	r2, r4	;; ## Warning: defaulting to text format
@@ -14645,7 +14650,7 @@ Disassembly of section .data:
 43e0839c:	e3a00205 	mov	r0, #1342177280	; 0x50000000
 43e083a0:	e59f10b4 	ldr	r1, [pc, #180]	; 0x43e0845c	;; ANDROID!
 43e083a4:	e3a02008 	mov	r2, #8
-43e083a8:	eb0069e4 	bl	0x43e22b40
+43e083a8:	eb0069e4 	bl	<memcmp>
 43e083ac:	e2507000 	subs	r7, r0, #0
 43e083b0:	159f00a8 	ldrne	r0, [pc, #168]	; 0x43e08460	;; Invalid recovery image!
 43e083b4:	1a000004 	bne	0x43e083cc
@@ -14674,11 +14679,11 @@ Disassembly of section .data:
 43e08410:	e1a01006 	mov	r1, r6
 43e08414:	e1a0a000 	mov	sl, r0
 43e08418:	e59f0050 	ldr	r0, [pc, #80]	; 0x43e08470
-43e0841c:	eb006991 	bl	0x43e22a68
+43e0841c:	eb006991 	bl	<memcpy>
 43e08420:	e5942010 	ldr	r2, [r4, #16]
 43e08424:	e3a00442 	mov	r0, #1107296256	; 0x42000000
 43e08428:	e0216a95 	mla	r1, r5, sl, r6
-43e0842c:	eb00698d 	bl	0x43e22a68
+43e0842c:	eb00698d 	bl	<memcpy>
 43e08430:	e5942008 	ldr	r2, [r4, #8]
 43e08434:	e59f3038 	ldr	r3, [pc, #56]	; 0x43e08474
 43e08438:	e1a00007 	mov	r0, r7
@@ -16093,8 +16098,9 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e09a38:	43e32a94 	mvnmi	r2, #148, 20	; 0x94000
 43e09a3c:	43e32aaf 	mvnmi	r2, #716800	; 0xaf000
 43e09a40:	43e32aea 	mvnmi	r2, #958464	; 0xea000
+
 43e09a44:	e92d4ef0 	push	{r4, r5, r6, r7, r9, sl, fp, lr}
-43e09a48:	e1a0a000 	mov	sl, r0	;; partion size %lld , image size %d
+43e09a48:	e1a0a000 	mov	sl, r0
 43e09a4c:	e1a04001 	mov	r4, r1
 43e09a50:	e5909014 	ldr	r9, [r0, #20]
 43e09a54:	e280501c 	add	r5, r0, #28
@@ -16117,7 +16123,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e09a98:	1a00001f 	bne	0x43e09b1c
 43e09a9c:	e3a00000 	mov	r0, #0
 43e09aa0:	e285700c 	add	r7, r5, #12
-43e09aa4:	eb001c9c 	bl	0x43e10d1c
+43e09aa4:	eb001c9c 	bl	<find_mmc_device>
 43e09aa8:	e3170007 	tst	r7, #7
 43e09aac:	e1a0b000 	mov	fp, r0
 43e09ab0:	0a000004 	beq	0x43e09ac8
@@ -16125,7 +16131,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e09ab8:	e3a0020a 	mov	r0, #-1610612736	; 0xa0000000
 43e09abc:	e1a02486 	lsl	r2, r6, #9
 43e09ac0:	e3a0720a 	mov	r7, #-1610612736	; 0xa0000000
-43e09ac4:	eb0063e7 	bl	0x43e22a68
+43e09ac4:	eb0063e7 	bl	<memcpy>
 43e09ac8:	e1a02004 	mov	r2, r4
 43e09acc:	e3a01000 	mov	r1, #0
 43e09ad0:	e1a03006 	mov	r3, r6
@@ -16997,7 +17003,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0a858:	ea000002 	b	0x43e0a868
 43e0a85c:	e1a00006 	mov	r0, r6	;; partion size %lld , image size %d
 43e0a860:	e1a01004 	mov	r1, r4
-43e0a864:	eb00607f 	bl	0x43e22a68
+43e0a864:	eb00607f 	bl	<memcpy>
 43e0a868:	e59f2234 	ldr	r2, [pc, #564]	; 0x43e0aaa4
 43e0a86c:	e0853007 	add	r3, r5, r7
 43e0a870:	e067a00a 	rsb	sl, r7, sl
@@ -17057,7 +17063,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0a948:	e5803008 	str	r3, [r0, #8]
 43e0a94c:	ea000037 	b	0x43e0aa30
 43e0a950:	e1a01004 	mov	r1, r4
-43e0a954:	eb006043 	bl	0x43e22a68
+43e0a954:	eb006043 	bl	<memcpy>
 43e0a958:	ea000034 	b	0x43e0aa30
 43e0a95c:	ebfffd5a 	bl	0x43e09ecc
 43e0a960:	e2506000 	subs	r6, r0, #0
@@ -17107,7 +17113,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0aa10:	e5832008 	str	r2, [r3, #8]
 43e0aa14:	ea000001 	b	0x43e0aa20
 43e0aa18:	e1a01004 	mov	r1, r4
-43e0aa1c:	eb006011 	bl	0x43e22a68
+43e0aa1c:	eb006011 	bl	<memcpy>
 43e0aa20:	e1a00004 	mov	r0, r4
 43e0aa24:	ebfffc9f 	bl	0x43e09ca8
 43e0aa28:	ea00001b 	b	0x43e0aa9c
@@ -17259,10 +17265,10 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0ac70:	e92d401f 	push	{r0, r1, r2, r3, r4, lr}
 43e0ac74:	e1a04000 	mov	r4, r0	;; ERROR: Environment import failed: errno = %d
 43e0ac78:	0a00000e 	beq	0x43e0acb8
-43e0ac7c:	e1a01004 	mov	r1, r4	;; ERROR: Environment import failed: errno = %d
+43e0ac7c:	e1a01004 	mov	r1, r4
 43e0ac80:	e3a02004 	mov	r2, #4
 43e0ac84:	e28d000c 	add	r0, sp, #12
-43e0ac88:	eb005f76 	bl	0x43e22a68
+43e0ac88:	eb005f76 	bl	<memcpy>
 43e0ac8c:	e3a00000 	mov	r0, #0
 43e0ac90:	e2841004 	add	r1, r4, #4
 43e0ac94:	e3032ffc 	tst	r3, #252, 30	; 0x3f0
@@ -17334,7 +17340,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0ad9c:	e24dd901 	sub	sp, sp, #16384	; 0x4000
 43e0ada0:	e24dd054 	sub	sp, sp, #84	; 0x54
 43e0ada4:	e3a00000 	mov	r0, #0
-43e0ada8:	eb0017db 	bl	0x43e10d1c
+43e0ada8:	eb0017db 	bl	<find_mmc_device>
 43e0adac:	e2507000 	subs	r7, r0, #0
 43e0adb0:	059f0140 	ldreq	r0, [pc, #320]	; 0x43e0aef8	;; No MMC card found
 43e0adb4:	0a00004d 	beq	0x43e0aef0
@@ -17434,7 +17440,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0af2c:	e24dd901 	sub	sp, sp, #16384	; 0x4000
 43e0af30:	e24dd04c 	sub	sp, sp, #76	; 0x4c
 43e0af34:	e3a00000 	mov	r0, #0
-43e0af38:	eb001777 	bl	0x43e10d1c
+43e0af38:	eb001777 	bl	<find_mmc_device>
 43e0af3c:	e250a000 	subs	sl, r0, #0
 43e0af40:	059f00c4 	ldreq	r0, [pc, #196]	; 0x43e0b00c	;; No MMC card found
 43e0af44:	0a000003 	beq	0x43e0af58
@@ -19186,7 +19192,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0ca8c:	e92d4010 	push	{r4, lr}
 43e0ca90:	e3a00000 	mov	r0, #0
 43e0ca94:	e24ddc02 	sub	sp, sp, #512	; 0x200
-43e0ca98:	eb00109f 	bl	0x43e10d1c
+43e0ca98:	eb00109f 	bl	<find_mmc_device>
 43e0ca9c:	e2504000 	subs	r4, r0, #0
 43e0caa0:	1a000005 	bne	0x43e0cabc
 43e0caa4:	e59f0048 	ldr	r0, [pc, #72]	; 0x43e0caf4	;; %s: Can't find MMC %d
@@ -19954,7 +19960,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0d68c:	0a000006 	beq	0x43e0d6ac
 43e0d690:	e1a01005 	mov	r1, r5
 43e0d694:	e3a0203c 	mov	r2, #60	; 0x3c
-43e0d698:	eb0054f2 	bl	0x43e22a68
+43e0d698:	eb0054f2 	bl	<memcpy>
 43e0d69c:	e2840008 	add	r0, r4, #8
 43e0d6a0:	e2851008 	add	r1, r5, #8
 43e0d6a4:	e3a02010 	mov	r2, #16
@@ -20709,7 +20715,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0e258:	e1a01005 	mov	r1, r5
 43e0e25c:	e1a02007 	mov	r2, r7
 43e0e260:	e2840c01 	add	r0, r4, #256	; 0x100
-43e0e264:	eb0051ff 	bl	0x43e22a68
+43e0e264:	eb0051ff 	bl	<memcpy>
 43e0e268:	e1a01005 	mov	r1, r5
 43e0e26c:	e1a00004 	mov	r0, r4
 43e0e270:	e1a02006 	mov	r2, r6
@@ -20727,7 +20733,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0e2a0:	e1a01005 	mov	r1, r5
 43e0e2a4:	e2800002 	add	r0, r0, #2
 43e0e2a8:	e5d52000 	ldrb	r2, [r5]
-43e0e2ac:	eb0051ed 	bl	0x43e22a68
+43e0e2ac:	eb0051ed 	bl	<memcpy>
 43e0e2b0:	e5c4611b 	strb	r6, [r4, #283]	; 0x11b
 43e0e2b4:	e5d46112 	ldrb	r6, [r4, #274]	; 0x112
 43e0e2b8:	e3e0b000 	mvn	fp, #0
@@ -20754,7 +20760,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0e30c:	e084000a 	add	r0, r4, sl
 43e0e310:	e084a00a 	add	sl, r4, sl
 43e0e314:	e2800f47 	add	r0, r0, #284	; 0x11c
-43e0e318:	eb0051d2 	bl	0x43e22a68
+43e0e318:	eb0051d2 	bl	<memcpy>
 43e0e31c:	e3a02000 	mov	r2, #0
 43e0e320:	e5dab11e 	ldrb	fp, [sl, #286]	; 0x11e
 43e0e324:	e5ca2125 	strb	r2, [sl, #293]	; 0x125
@@ -20779,7 +20785,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0e370:	e28aae12 	add	sl, sl, #288	; 0x120
 43e0e374:	e084a00a 	add	sl, r4, sl
 43e0e378:	e28a0008 	add	r0, sl, #8
-43e0e37c:	eb0051b9 	bl	0x43e22a68
+43e0e37c:	eb0051b9 	bl	<memcpy>
 43e0e380:	e5da000d 	ldrb	r0, [sl, #13]
 43e0e384:	e5da100c 	ldrb	r1, [sl, #12]
 43e0e388:	e1811400 	orr	r1, r1, r0, lsl #8
@@ -21219,7 +21225,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0ea50:	e1a01005 	mov	r1, r5
 43e0ea54:	e5d52000 	ldrb	r2, [r5]
 43e0ea58:	e2860004 	add	r0, r6, #4
-43e0ea5c:	eb005001 	bl	0x43e22a68
+43e0ea5c:	eb005001 	bl	<memcpy>
 43e0ea60:	e5d52004 	ldrb	r2, [r5, #4]
 43e0ea64:	e5d53003 	ldrb	r3, [r5, #3]
 43e0ea68:	e3a010ff 	mov	r1, #255	; 0xff
@@ -21843,7 +21849,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0f410:	e0899007 	add	r9, r9, r7
 43e0f414:	e1a02007 	mov	r2, r7
 43e0f418:	e08bb007 	add	fp, fp, r7
-43e0f41c:	eb004d91 	bl	0x43e22a68
+43e0f41c:	eb004d91 	bl	<memcpy>
 43e0f420:	e5943410 	ldr	r3, [r4, #1040]	; 0x410
 43e0f424:	e0673003 	rsb	r3, r7, r3
 43e0f428:	e5843410 	str	r3, [r4, #1040]	; 0x410
@@ -22644,7 +22650,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e10094:	e04dd003 	sub	sp, sp, r3
 43e10098:	e1a0000d 	mov	r0, sp
 43e1009c:	e1a0600d 	mov	r6, sp
-43e100a0:	eb004a70 	bl	0x43e22a68
+43e100a0:	eb004a70 	bl	<memcpy>
 43e100a4:	e3a02000 	mov	r2, #0
 43e100a8:	e51b0020 	ldr	r0, [fp, #-32]	; 0xffffffe0
 43e100ac:	e1a03002 	mov	r3, r2
@@ -22776,7 +22782,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e102a4:	e1a02106 	lsl	r2, r6, #2
 43e102a8:	e1a07000 	mov	r7, r0
 43e102ac:	e1a00005 	mov	r0, r5
-43e102b0:	eb0049ec 	bl	0x43e22a68
+43e102b0:	eb0049ec 	bl	<memcpy>
 43e102b4:	e1570006 	cmp	r7, r6
 43e102b8:	e584605c 	str	r6, [r4, #92]	; 0x5c
 43e102bc:	1a000004 	bne	0x43e102d4
@@ -23443,8 +23449,9 @@ run_command:	e92d4008 	push	{r3, lr}
 43e10d10:	ebffffb0 	bl	0x43e10bd8
 43e10d14:	e28dd024 	add	sp, sp, #36	; 0x24
 43e10d18:	e8bd8000 	ldmfd	sp!, {pc}
-43e10d1c:	e92d4008 	push	{r3, lr}
-43e10d20:	e1a01000 	mov	r1, r0	;; Timeout waiting card ready
+
+find_mmc_device:	e92d4008 	push	{r3, lr}
+43e10d20:	e1a01000 	mov	r1, r0
 43e10d24:	e59f302c 	ldr	r3, [pc, #44]	; 0x43e10d58
 43e10d28:	e5930000 	ldr	r0, [r3]
 43e10d2c:	ea000003 	b	0x43e10d40
@@ -23460,25 +23467,27 @@ run_command:	e92d4008 	push	{r3, lr}
 43e10d54:	e8bd8008 	pop	{r3, pc}
 43e10d58:	43e44040 	mvnmi	r4, #64	; 0x40
 43e10d5c:	43e33a5e 	mvnmi	r3, #385024	; 0x5e000
+
 43e10d60:	e92d4ef0 	push	{r4, r5, r6, r7, r9, sl, fp, lr}
 43e10d64:	e24dd020 	sub	sp, sp, #32
-43e10d68:	e1a09001 	mov	r9, r1	;; Timeout waiting card ready
-43e10d6c:	e1a04002 	mov	r4, r2
-43e10d70:	ebffffe9 	bl	0x43e10d1c
+43e10d68:	e1a09001 	mov	r9, r1							;; r9 = r1
+43e10d6c:	e1a04002 	mov	r4, r2							;; r4 = r2
+43e10d70:	ebffffe9 	bl	<find_mmc_device>
 43e10d74:	e1a02004 	mov	r2, r4
-43e10d78:	e3a03000 	mov	r3, #0
-43e10d7c:	e1a01009 	mov	r1, r9	;; Timeout waiting card ready
-43e10d80:	e3a06000 	mov	r6, #0
+43e10d78:	e3a03000 	mov	r3, #0							;; r3 = 0
+43e10d7c:	e1a01009 	mov	r1, r9
+43e10d80:	e3a06000 	mov	r6, #0							;; r6 = 0
 43e10d84:	e1a05000 	mov	r5, r0
 43e10d88:	e59f0254 	ldr	r0, [pc, #596]	; 0x43e10fe4	;; START: %lu BLOCK: %llu
-43e10d8c:	ebffe226 	bl	<printf>
-43e10d90:	e5951040 	ldr	r1, [r5, #64]	; 0x40
+43e10d8c:	ebffe226 	bl	<printf>						;; printf(, start, block)
+43e10d90:	e5951040 	ldr	r1, [r5, #64]	; 0x40			;; mmc->high_capacity
 43e10d94:	e59f024c 	ldr	r0, [pc, #588]	; 0x43e10fe8	;; high_capacity: %d
 43e10d98:	ebffe223 	bl	<printf>
 43e10d9c:	e1c52ad0 			; <UNDEFINED> instruction: 0xe1c52ad0
+								;; ldrd r2, r3, [r5, 0xa0]	;; b64, mmc->capacity
 43e10da0:	e59f0244 	ldr	r0, [pc, #580]	; 0x43e10fec	;; Capacity: %llu
 43e10da4:	ebffe220 	bl	<printf>
-43e10da8:	e59f0240 	ldr	r0, [pc, #576]	; 0x43e10ff0
+43e10da8:	e59f0240 	ldr	r0, [pc, #576]	; 0x43e10ff0	;; "\nErase\n"
 43e10dac:	ebffe21e 	bl	<printf>
 43e10db0:	ea000039 	b	0x43e10e9c
 43e10db4:	e5952040 	ldr	r2, [r5, #64]	; 0x40
@@ -23640,7 +23649,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e11024:	e1a04002 	mov	r4, r2
 43e11028:	e1a07001 	mov	r7, r1
 43e1102c:	e1a0a003 	mov	sl, r3
-43e11030:	ebffff39 	bl	0x43e10d1c
+43e11030:	ebffff39 	bl	<find_mmc_device>
 43e11034:	e2505000 	subs	r5, r0, #0
 43e11038:	01a04005 	moveq	r4, r5
 43e1103c:	0a00003a 	beq	0x43e1112c
@@ -23748,7 +23757,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e111d4:	e1a00004 	mov	r0, r4
 43e111d8:	e3a0120a 	mov	r1, #-1610612736	; 0xa0000000
 43e111dc:	e1a02485 	lsl	r2, r5, #9
-43e111e0:	eb004620 	bl	0x43e22a68
+43e111e0:	eb004620 	bl	<memcpy>
 43e111e4:	e1a00005 	mov	r0, r5
 43e111e8:	e28dd034 	add	sp, sp, #52	; 0x34
 43e111ec:	e8bd80f0 	pop	{r4, r5, r6, r7, pc}
@@ -23757,7 +23766,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e111f8:	e1a07001 	mov	r7, r1
 43e111fc:	e1a0a003 	mov	sl, r3
 43e11200:	0a00001c 	beq	0x43e11278
-43e11204:	ebfffec4 	bl	0x43e10d1c
+43e11204:	ebfffec4 	bl	<find_mmc_device>
 43e11208:	e2505000 	subs	r5, r0, #0
 43e1120c:	01a04005 	moveq	r4, r5
 43e11210:	0a000018 	beq	0x43e11278
@@ -24066,7 +24075,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e116cc:	0001003f 	andeq	r0, r1, pc, lsr r0
 43e116d0:	e92d4010 	push	{r4, lr}
 43e116d4:	e1a04001 	mov	r4, r1
-43e116d8:	ebfffd8f 	bl	0x43e10d1c
+43e116d8:	ebfffd8f 	bl	<find_mmc_device>
 43e116dc:	e2503000 	subs	r3, r0, #0
 43e116e0:	0a000007 	beq	0x43e11704
 43e116e4:	e5d3308c 	ldrb	r3, [r3, #140]	; 0x8c
@@ -24283,7 +24292,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e11a30:	e3a02010 	mov	r2, #16
 43e11a34:	e2840074 	add	r0, r4, #116	; 0x74
 43e11a38:	e28d1024 	add	r1, sp, #36	; 0x24
-43e11a3c:	eb004409 	bl	0x43e22a68
+43e11a3c:	eb004409 	bl	<memcpy>
 43e11a40:	e5942054 	ldr	r2, [r4, #84]	; 0x54
 43e11a44:	e2122a01 	ands	r2, r2, #4096	; 0x1000
 43e11a48:	1a000012 	bne	0x43e11a98
@@ -24780,7 +24789,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e121f4:	43e33c18 	mvnmi	r3, #24, 24	; 0x1800
 43e121f8:	43e33c2e 	mvnmi	r3, #11776	; 0x2e00
 43e121fc:	e92d4010 	push	{r4, lr}
-43e12200:	ebfffac5 	bl	0x43e10d1c
+43e12200:	ebfffac5 	bl	<find_mmc_device>
 43e12204:	e2504000 	subs	r4, r0, #0
 43e12208:	0a000002 	beq	0x43e12218
 43e1220c:	ebffffc2 	bl	0x43e1211c
@@ -24839,7 +24848,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e122e0:	e59f004c 	ldr	r0, [pc, #76]	; 0x43e12334	;; MMC Device %d:
 43e122e4:	ebffdcd0 	bl	<printf>
 43e122e8:	e1a00004 	mov	r0, r4
-43e122ec:	ebfffa8a 	bl	0x43e10d1c
+43e122ec:	ebfffa8a 	bl	<find_mmc_device>
 43e122f0:	e2506000 	subs	r6, r0, #0
 43e122f4:	0a000009 	beq	0x43e12320
 43e122f8:	ebffff87 	bl	0x43e1211c
@@ -28214,7 +28223,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1579c:	158430a0 	strne	r3, [r4, #160]	; 0xa0
 43e157a0:	e59400a0 	ldr	r0, [r4, #160]	; 0xa0
 43e157a4:	e58400b0 	str	r0, [r4, #176]	; 0xb0
-43e157a8:	eb0034ae 	bl	0x43e22a68
+43e157a8:	eb0034ae 	bl	<memcpy>
 43e157ac:	e5940198 	ldr	r0, [r4, #408]	; 0x198
 43e157b0:	ebfffa1a 	bl	0x43e14020
 43e157b4:	e594b0a4 	ldr	fp, [r4, #164]	; 0xa4
@@ -28534,7 +28543,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e15c9c:	e59421d0 	ldr	r2, [r4, #464]	; 0x1d0
 43e15ca0:	e1a01006 	mov	r1, r6
 43e15ca4:	e59401d4 	ldr	r0, [r4, #468]	; 0x1d4
-43e15ca8:	eb00336e 	bl	0x43e22a68
+43e15ca8:	eb00336e 	bl	<memcpy>
 43e15cac:	e59401d4 	ldr	r0, [r4, #468]	; 0x1d4
 43e15cb0:	e59411d0 	ldr	r1, [r4, #464]	; 0x1d0
 43e15cb4:	e3a03001 	mov	r3, #1
@@ -29539,7 +29548,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e16c50:	e1a0000b 	mov	r0, fp
 43e16c54:	e1a0100a 	mov	r1, sl
 43e16c58:	e1a02007 	mov	r2, r7
-43e16c5c:	eb002f81 	bl	0x43e22a68
+43e16c5c:	eb002f81 	bl	<memcpy>
 43e16c60:	e3a00000 	mov	r0, #0
 43e16c64:	e5847518 	str	r7, [r4, #1304]	; 0x518
 43e16c68:	e5840514 	str	r0, [r4, #1300]	; 0x514
@@ -33016,7 +33025,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1a2a4:	e06a4004 	rsb	r4, sl, r4
 43e1a2a8:	e1a0200a 	mov	r2, sl
 43e1a2ac:	e2855001 	add	r5, r5, #1
-43e1a2b0:	eb0021ec 	bl	0x43e22a68
+43e1a2b0:	eb0021ec 	bl	<memcpy>
 43e1a2b4:	e284af7f 	add	sl, r4, #508	; 0x1fc
 43e1a2b8:	e3540000 	cmp	r4, #0
 43e1a2bc:	b28aa003 	addlt	sl, sl, #3
@@ -33062,7 +33071,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1a35c:	e1a00006 	mov	r0, r6
 43e1a360:	e1a01007 	mov	r1, r7
 43e1a364:	e1a02004 	mov	r2, r4
-43e1a368:	eb0021be 	bl	0x43e22a68
+43e1a368:	eb0021be 	bl	<memcpy>
 43e1a36c:	e1a0000a 	mov	r0, sl
 43e1a370:	e28ddf91 	add	sp, sp, #580	; 0x244
 43e1a374:	e8bd86f0 	pop	{r4, r5, r6, r7, r9, sl, pc}
@@ -33192,7 +33201,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1a564:	e1a00001 	mov	r0, r1
 43e1a568:	e3a02008 	mov	r2, #8
 43e1a56c:	e1a01006 	mov	r1, r6
-43e1a570:	eb00213c 	bl	0x43e22a68
+43e1a570:	eb00213c 	bl	<memcpy>
 43e1a574:	e3a03000 	mov	r3, #0
 43e1a578:	e5c43008 	strb	r3, [r4, #8]
 43e1a57c:	e1a03004 	mov	r3, r4
@@ -33212,7 +33221,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1a5b4:	e2861008 	add	r1, r6, #8
 43e1a5b8:	e4c03001 	strb	r3, [r0], #1
 43e1a5bc:	e3a02003 	mov	r2, #3
-43e1a5c0:	eb002128 	bl	0x43e22a68
+43e1a5c0:	eb002128 	bl	<memcpy>
 43e1a5c4:	e5c57004 	strb	r7, [r5, #4]
 43e1a5c8:	e1a03005 	mov	r3, r5
 43e1a5cc:	ea000000 	b	0x43e1a5d4
@@ -33257,7 +33266,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1a668:	e1a00006 	mov	r0, r6
 43e1a66c:	e1a01005 	mov	r1, r5
 43e1a670:	e3a02040 	mov	r2, #64	; 0x40
-43e1a674:	eb0020fb 	bl	0x43e22a68
+43e1a674:	eb0020fb 	bl	<memcpy>
 43e1a678:	e1d631b6 	ldrh	r3, [r6, #22]
 43e1a67c:	e1a00007 	mov	r0, r7
 43e1a680:	e3a0201a 	mov	r2, #26
@@ -33268,7 +33277,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1a694:	13a03000 	movne	r3, #0
 43e1a698:	e1a01006 	mov	r1, r6
 43e1a69c:	e5843000 	str	r3, [r4]
-43e1a6a0:	eb0020f0 	bl	0x43e22a68
+43e1a6a0:	eb0020f0 	bl	<memcpy>
 43e1a6a4:	e5943000 	ldr	r3, [r4]
 43e1a6a8:	e2866012 	add	r6, r6, #18
 43e1a6ac:	e3530020 	cmp	r3, #32
@@ -33364,7 +33373,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1a814:	e1a00007 	mov	r0, r7
 43e1a818:	e1a02001 	mov	r2, r1
 43e1a81c:	e1a0100a 	mov	r1, sl
-43e1a820:	eb002090 	bl	0x43e22a68
+43e1a820:	eb002090 	bl	<memcpy>
 43e1a824:	e3a00000 	mov	r0, #0
 43e1a828:	e51bd020 	ldr	sp, [fp, #-32]	; 0xffffffe0
 43e1a82c:	e24bd01c 	sub	sp, fp, #28
@@ -33520,7 +33529,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1aa84:	e1a0000a 	mov	r0, sl
 43e1aa88:	e1a01005 	mov	r1, r5
 43e1aa8c:	e3a02020 	mov	r2, #32
-43e1aa90:	eb001ff4 	bl	0x43e22a68
+43e1aa90:	eb001ff4 	bl	<memcpy>
 43e1aa94:	e3a00000 	mov	r0, #0
 43e1aa98:	ea000000 	b	0x43e1aaa0
 43e1aa9c:	e3e00000 	mvn	r0, #0
@@ -33589,7 +33598,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1ab98:	e59f1070 	ldr	r1, [pc, #112]	; 0x43e1ac10
 43e1ab9c:	e2800002 	add	r0, r0, #2
 43e1aba0:	e3a02002 	mov	r2, #2
-43e1aba4:	eb001fe5 	bl	0x43e22b40
+43e1aba4:	eb001fe5 	bl	<memcmp>
 43e1aba8:	e2504000 	subs	r4, r0, #0
 43e1abac:	0a000003 	beq	0x43e1abc0
 43e1abb0:	e59f304c 	ldr	r3, [pc, #76]	; 0x43e1ac04
@@ -33599,13 +33608,13 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1abc0:	e28a0036 	add	r0, sl, #54	; 0x36
 43e1abc4:	e59f1048 	ldr	r1, [pc, #72]	; 0x43e1ac14
 43e1abc8:	e3a02003 	mov	r2, #3
-43e1abcc:	eb001fdb 	bl	0x43e22b40
+43e1abcc:	eb001fdb 	bl	<memcmp>
 43e1abd0:	e3500000 	cmp	r0, #0
 43e1abd4:	0a000008 	beq	0x43e1abfc
 43e1abd8:	e28a0052 	add	r0, sl, #82	; 0x52
 43e1abdc:	e59f1034 	ldr	r1, [pc, #52]	; 0x43e1ac18
 43e1abe0:	e3a02005 	mov	r2, #5
-43e1abe4:	eb001fd5 	bl	0x43e22b40
+43e1abe4:	eb001fd5 	bl	<memcmp>
 43e1abe8:	e3500000 	cmp	r0, #0
 43e1abec:	0a000002 	beq	0x43e1abfc
 43e1abf0:	e59f300c 	ldr	r3, [pc, #12]	; 0x43e1ac04
@@ -34542,7 +34551,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1ba7c:	e1a01004 	mov	r1, r4
 43e1ba80:	e3a02020 	mov	r2, #32
 43e1ba84:	e59da02c 	ldr	sl, [sp, #44]	; 0x2c
-43e1ba88:	eb001bf6 	bl	0x43e22a68
+43e1ba88:	eb001bf6 	bl	<memcpy>
 43e1ba8c:	e59d301c 	ldr	r3, [sp, #28]
 43e1ba90:	e3530000 	cmp	r3, #0
 43e1ba94:	aa000022 	bge	0x43e1bb24
@@ -34767,7 +34776,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1be00:	e28d101b 	add	r1, sp, #27
 43e1be04:	e3a0200b 	mov	r2, #11
 43e1be08:	e28d0008 	add	r0, sp, #8
-43e1be0c:	eb001b15 	bl	0x43e22a68
+43e1be0c:	eb001b15 	bl	<memcpy>
 43e1be10:	e59f3058 	ldr	r3, [pc, #88]	; 0x43e1be70
 43e1be14:	e59f0058 	ldr	r0, [pc, #88]	; 0x43e1be74	;; Partition %d: Filesystem: %s "%s"
 43e1be18:	e28d2026 	add	r2, sp, #38	; 0x26
@@ -36115,7 +36124,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1d310:	e5c67006 	strb	r7, [r6, #6]
 43e1d314:	e5c63007 	strb	r3, [r6, #7]
 43e1d318:	e59d1030 	ldr	r1, [sp, #48]	; 0x30
-43e1d31c:	eb0015d1 	bl	0x43e22a68
+43e1d31c:	eb0015d1 	bl	<memcpy>
 43e1d320:	e5943000 	ldr	r3, [r4]
 43e1d324:	e1a00006 	mov	r0, r6
 43e1d328:	e0835005 	add	r5, r3, r5
@@ -36377,7 +36386,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1d728:	e2840028 	add	r0, r4, #40	; 0x28
 43e1d72c:	e1a01007 	mov	r1, r7	;; make_file
 43e1d730:	e1a02006 	mov	r2, r6	;; make_file
-43e1d734:	eb0014cb 	bl	0x43e22a68
+43e1d734:	eb0014cb 	bl	<memcpy>
 43e1d738:	ea000009 	b	0x43e1d764
 43e1d73c:	e59fa038 	ldr	sl, [pc, #56]	; 0x43e1d77c
 43e1d740:	e59a1008 	ldr	r1, [sl, #8]
@@ -36385,7 +36394,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1d748:	eb0005d4 	bl	0x43e1eea0
 43e1d74c:	e1a01007 	mov	r1, r7	;; make_file
 43e1d750:	e1a02006 	mov	r2, r6	;; make_file
-43e1d754:	eb0014c3 	bl	0x43e22a68
+43e1d754:	eb0014c3 	bl	<memcpy>
 43e1d758:	e59a3008 	ldr	r3, [sl, #8]
 43e1d75c:	e1a034a3 	lsr	r3, r3, #9
 43e1d760:	e584301c 	str	r3, [r4, #28]
@@ -36526,7 +36535,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1d97c:	e5961038 	ldr	r1, [r6, #56]	; 0x38
 43e1d980:	e3a02b01 	mov	r2, #1024	; 0x400
 43e1d984:	e2800008 	add	r0, r0, #8
-43e1d988:	eb001436 	bl	0x43e22a68
+43e1d988:	eb001436 	bl	<memcpy>
 43e1d98c:	e5963010 	ldr	r3, [r6, #16]
 43e1d990:	e58d7000 	str	r7, [sp]
 43e1d994:	e1a00005 	mov	r0, r5
@@ -36938,7 +36947,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1dfec:	e2800f43 	add	r0, r0, #268	; 0x10c
 43e1dff0:	e28dd00c 	add	sp, sp, #12
 43e1dff4:	e8bd4030 	pop	{r4, r5, lr}
-43e1dff8:	ea00129a 	b	0x43e22a68
+43e1dff8:	ea00129a 	b	<memcpy>
 43e1dffc:	43e34f4c 	mvnmi	r4, #76, 30	; 0x130
 43e1e000:	43f74ac8 	mvnsmi	r4, #200, 20	; 0xc8000
 43e1e004:	43e34f74 	mvnmi	r4, #116, 30	; 0x1d0
@@ -37972,7 +37981,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e1f014:	e3a02040 	mov	r2, #64	; 0x40
 43e1f018:	e28d0050 	add	r0, sp, #80	; 0x50
 43e1f01c:	e59f4fc8 	ldr	r4, [pc, #4040]	; 0x43e1ffec
-43e1f020:	eb000e90 	bl	0x43e22a68
+43e1f020:	eb000e90 	bl	<memcpy>
 43e1f024:	e59da048 	ldr	sl, [sp, #72]	; 0x48
 43e1f028:	e59d6048 	ldr	r6, [sp, #72]	; 0x48
 43e1f02c:	e59d9048 	ldr	r9, [sp, #72]	; 0x48
@@ -39329,7 +39338,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e20548:	e1a01006 	mov	r1, r6
 43e2054c:	e280001c 	add	r0, r0, #28
 43e20550:	e1a02007 	mov	r2, r7
-43e20554:	eb000943 	bl	0x43e22a68
+43e20554:	eb000943 	bl	<memcpy>
 43e20558:	e1a00004 	mov	r0, r4
 43e2055c:	e284101c 	add	r1, r4, #28
 43e20560:	ebfffa98 	bl	0x43e1efc8
@@ -39347,7 +39356,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e20590:	e280001c 	add	r0, r0, #28
 43e20594:	e0672005 	rsb	r2, r7, r5
 43e20598:	e8bd40f8 	pop	{r3, r4, r5, r6, r7, lr}
-43e2059c:	ea000931 	b	0x43e22a68
+43e2059c:	ea000931 	b	<memcpy>
 43e205a0:	43e3536a 	mvnmi	r5, #-1476395007	; 0xa8000001
 43e205a4:	43e35377 	mvnmi	r5, #-603979775	; 0xdc000001
 43e205a8:	43e35395 	mvnmi	r5, #1409286146	; 0x54000002
@@ -39441,7 +39450,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e20708:	e3a02014 	mov	r2, #20
 43e2070c:	e1a00004 	mov	r0, r4
 43e20710:	e1a0100d 	mov	r1, sp
-43e20714:	eb0008d3 	bl	0x43e22a68
+43e20714:	eb0008d3 	bl	<memcpy>
 43e20718:	e5943000 	ldr	r3, [r4]
 43e2071c:	e6bf3f33 			; <UNDEFINED> instruction: 0xe6bf3f33
 43e20720:	e5843000 	str	r3, [r4]
@@ -40829,7 +40838,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e21cb8:	0a000077 	beq	0x43e21e9c
 43e21cbc:	e1a01004 	mov	r1, r4
 43e21cc0:	e1a02006 	mov	r2, r6
-43e21cc4:	eb000367 	bl	0x43e22a68
+43e21cc4:	eb000367 	bl	<memcpy>
 43e21cc8:	e59d3040 	ldr	r3, [sp, #64]	; 0x40
 43e21ccc:	e3130001 	tst	r3, #1
 43e21cd0:	1a000004 	bne	0x43e21ce8
@@ -41702,7 +41711,8 @@ run_command:	e92d4008 	push	{r3, lr}
 43e22a5c:	1afffffa 	bne	0x43e22a4c
 43e22a60:	e1a00001 	mov	r0, r1
 43e22a64:	e12fff1e 	bx	lr
-43e22a68:	e1510000 	cmp	r1, r0
+
+memcpy:	e1510000 	cmp	r1, r0
 43e22a6c:	e92d4030 	push	{r4, r5, lr}
 43e22a70:	08bd8030 	popeq	{r4, r5, pc}
 43e22a74:	e1803001 	orr	r3, r0, r1
@@ -41756,7 +41766,8 @@ run_command:	e92d4008 	push	{r3, lr}
 43e22b34:	e3520000 	cmp	r2, #0
 43e22b38:	1afffff8 	bne	0x43e22b20
 43e22b3c:	e8bd8010 	pop	{r4, pc}
-43e22b40:	e92d4010 	push	{r4, lr}
+
+memcmp:	e92d4010 	push	{r4, lr}
 43e22b44:	e1a03000 	mov	r3, r0
 43e22b48:	e3a0c000 	mov	ip, #0
 43e22b4c:	ea000004 	b	0x43e22b64
@@ -41794,7 +41805,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e22bcc:	e1a00004 	mov	r0, r4
 43e22bd0:	e1a01007 	mov	r1, r7
 43e22bd4:	e1a02006 	mov	r2, r6
-43e22bd8:	ebffffd8 	bl	0x43e22b40
+43e22bd8:	ebffffd8 	bl	<memcmp>
 43e22bdc:	e3500000 	cmp	r0, #0
 43e22be0:	0a000004 	beq	0x43e22bf8
 43e22be4:	e2455001 	sub	r5, r5, #1
@@ -44072,7 +44083,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e24f64:	e1a01009 	mov	r1, r9
 43e24f68:	80622003 	rsbhi	r2, r2, r3
 43e24f6c:	91a0200a 	movls	r2, sl
-43e24f70:	ebfff6bc 	bl	0x43e22a68
+43e24f70:	ebfff6bc 	bl	<memcpy>
 43e24f74:	e5943010 	ldr	r3, [r4, #16]
 43e24f78:	e3130c02 	tst	r3, #512	; 0x200
 43e24f7c:	0a000004 	beq	0x43e24f94
@@ -44350,7 +44361,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e253bc:	e1a0200a 	mov	r2, sl
 43e253c0:	e59d0014 	ldr	r0, [sp, #20]
 43e253c4:	e06a7007 	rsb	r7, sl, r7
-43e253c8:	ebfff5a6 	bl	0x43e22a68
+43e253c8:	ebfff5a6 	bl	<memcpy>
 43e253cc:	e59d300c 	ldr	r3, [sp, #12]
 43e253d0:	e59d0014 	ldr	r0, [sp, #20]
 43e253d4:	e089900a 	add	r9, r9, sl
@@ -45077,7 +45088,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e25f18:	e59b100c 	ldr	r1, [fp, #12]
 43e25f1c:	e5950034 	ldr	r0, [r5, #52]	; 0x34
 43e25f20:	e0621001 	rsb	r1, r2, r1
-43e25f24:	ebfff2cf 	bl	0x43e22a68
+43e25f24:	ebfff2cf 	bl	<memcpy>
 43e25f28:	e3a03000 	mov	r3, #0
 43e25f2c:	e5853030 	str	r3, [r5, #48]	; 0x30
 43e25f30:	ea000011 	b	0x43e25f7c
@@ -45090,14 +45101,14 @@ run_command:	e92d4008 	push	{r3, lr}
 43e25f4c:	e0800003 	add	r0, r0, r3
 43e25f50:	e0661001 	rsb	r1, r6, r1
 43e25f54:	e1a02007 	mov	r2, r7
-43e25f58:	ebfff2c2 	bl	0x43e22a68
+43e25f58:	ebfff2c2 	bl	<memcpy>
 43e25f5c:	e0566007 	subs	r6, r6, r7
 43e25f60:	0a000008 	beq	0x43e25f88
 43e25f64:	e59b100c 	ldr	r1, [fp, #12]
 43e25f68:	e1a02006 	mov	r2, r6
 43e25f6c:	e5950034 	ldr	r0, [r5, #52]	; 0x34
 43e25f70:	e0661001 	rsb	r1, r6, r1
-43e25f74:	ebfff2bb 	bl	0x43e22a68
+43e25f74:	ebfff2bb 	bl	<memcpy>
 43e25f78:	e5856030 	str	r6, [r5, #48]	; 0x30
 43e25f7c:	e5953028 	ldr	r3, [r5, #40]	; 0x28
 43e25f80:	e585302c 	str	r3, [r5, #44]	; 0x2c
@@ -46640,7 +46651,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e27784:	e24ddb01 	sub	sp, sp, #1024	; 0x400
 43e27788:	e24dd004 	sub	sp, sp, #4
 43e2778c:	e3a00000 	mov	r0, #0
-43e27790:	ebffa561 	bl	0x43e10d1c
+43e27790:	ebffa561 	bl	<find_mmc_device>
 43e27794:	e2505000 	subs	r5, r0, #0
 43e27798:	1a000005 	bne	0x43e277b4
 43e2779c:	e59f0068 	ldr	r0, [pc, #104]	; 0x43e2780c	;; %s: Can't find MMC %d
@@ -46660,7 +46671,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e277d4:	e1a0000d 	mov	r0, sp
 43e277d8:	e2841f56 	add	r1, r4, #344	; 0x158
 43e277dc:	e3a02040 	mov	r2, #64	; 0x40
-43e277e0:	ebffecd6 	bl	0x43e22b40
+43e277e0:	ebffecd6 	bl	<memcmp>
 43e277e4:	e3500000 	cmp	r0, #0
 43e277e8:	13a00000 	movne	r0, #0
 43e277ec:	1a000003 	bne	0x43e27800
@@ -46733,28 +46744,29 @@ is_system_locked:	e92d4030 	push	{r4, r5, lr}
 43e278f0:	e24ddb01 	sub	sp, sp, #1024	; 0x400
 43e278f4:	e24dd004 	sub	sp, sp, #4
 43e278f8:	ebffffc6 	bl	0x43e27818
-43e278fc:	e1a05000 	mov	r5, r0
-43e27900:	e3a00000 	mov	r0, #0
-43e27904:	ebffa504 	bl	0x43e10d1c
-43e27908:	e2504000 	subs	r4, r0, #0
+43e278fc:	e1a05000 	mov	r5, r0							;; r5 = 
+43e27900:	e3a00000 	mov	r0, #0							;; r0 = 0
+43e27904:	ebffa504 	bl	<find_mmc_device>				;; r0 = (struct mmc *)find_mmc_device(0)
+43e27908:	e2504000 	subs	r4, r0, #0					;; r4 = (struct mmc *)
 43e2790c:	1a000005 	bne	0x43e27928
-43e27910:	e59f0064 	ldr	r0, [pc, #100]	; 0x43e2797c	;; %s: Can't find MMC %d
-43e27914:	e1a02004 	mov	r2, r4
-43e27918:	e59f1060 	ldr	r1, [pc, #96]	; 0x43e27980	;; is_system_locked
-43e2791c:	ebff8742 	bl	<printf>
-43e27920:	e1a00004 	mov	r0, r4
+43e27910:	e59f0064 	ldr	r0, [pc, #100]	; 0x43e2797c	;; r0 = %s: Can't find MMC %d
+43e27914:	e1a02004 	mov	r2, r4							;; r2 = r4 = 0
+43e27918:	e59f1060 	ldr	r1, [pc, #96]	; 0x43e27980	;; r1 = is_system_locked
+43e2791c:	ebff8742 	bl	<printf>						;; printf
+43e27920:	e1a00004 	mov	r0, r4							;; return 0????
 43e27924:	ea000011 	b	0x43e27970
+
 43e27928:	e595102c 	ldr	r1, [r5, #44]	; 0x2c
-43e2792c:	e3a02002 	mov	r2, #2
+43e2792c:	e3a02002 	mov	r2, #2							;; r2 = 2
 43e27930:	e594c108 	ldr	ip, [r4, #264]	; 0x108
-43e27934:	e1a0300d 	mov	r3, sp
-43e27938:	e2811022 	add	r1, r1, #34	; 0x22
-43e2793c:	e3a00000 	mov	r0, #0
+43e27934:	e1a0300d 	mov	r3, sp							;; r3 = buf
+43e27938:	e2811022 	add	r1, r1, #34	; 0x22				;; r1 += 0x22
+43e2793c:	e3a00000 	mov	r0, #0							;; r0 = 0
 43e27940:	e12fff3c 	blx	ip
-43e27944:	e1a0000d 	mov	r0, sp
-43e27948:	e59f1034 	ldr	r1, [pc, #52]	; 0x43e27984
-43e2794c:	e3a02040 	mov	r2, #64	; 0x40
-43e27950:	ebffec7a 	bl	0x43e22b40
+43e27944:	e1a0000d 	mov	r0, sp							;; r0 = buf
+43e27948:	e59f1034 	ldr	r1, [pc, #52]	; 0x43e27984	;; r1 = 'ZZZZZZ', file offset:0x3e4ac
+43e2794c:	e3a02040 	mov	r2, #64	; 0x40					;; r2 = 0x40
+43e27950:	ebffec7a 	bl	<memcmp>						;; memcmp(, 0x40)
 43e27954:	e3500000 	cmp	r0, #0
 43e27958:	13a00000 	movne	r0, #0
 43e2795c:	1a000003 	bne	0x43e27970
@@ -46768,6 +46780,7 @@ is_system_locked:	e92d4030 	push	{r4, r5, lr}
 43e2797c:	43e3324f 	mvnmi	r3, #-268435452	; 0xf0000004
 43e27980:	43e2e0be 	mvnmi	lr, #190	; 0xbe
 43e27984:	43e368ac 	mvnmi	r6, #172, 16	; 0xac0000
+
 43e27988:	e59f3038 	ldr	r3, [pc, #56]	; 0x43e279c8
 43e2798c:	e3a0200c 	mov	r2, #12
 43e27990:	e0223092 	mla	r2, r2, r0, r3
@@ -46969,11 +46982,11 @@ is_system_locked:	e92d4030 	push	{r4, r5, lr}
 43e27ca0:	e584317c 	str	r3, [r4, #380]	; 0x17c
 43e27ca4:	e3a02f85 	mov	r2, #532	; 0x214
 43e27ca8:	e28d00e4 	add	r0, sp, #228	; 0xe4
-43e27cac:	ebffeb6d 	bl	0x43e22a68
+43e27cac:	ebffeb6d 	bl	<memcpy>
 43e27cb0:	e3a02098 	mov	r2, #152	; 0x98
 43e27cb4:	e28d004c 	add	r0, sp, #76	; 0x4c
 43e27cb8:	e59f10fc 	ldr	r1, [pc, #252]	; 0x43e27dbc
-43e27cbc:	ebffeb69 	bl	0x43e22a68
+43e27cbc:	ebffeb69 	bl	<memcpy>
 43e27cc0:	e59f30f8 	ldr	r3, [pc, #248]	; 0x43e27dc0
 43e27cc4:	e59f00f8 	ldr	r0, [pc, #248]	; 0x43e27dc4
 43e27cc8:	e28d204c 	add	r2, sp, #76	; 0x4c
@@ -47015,7 +47028,7 @@ is_system_locked:	e92d4030 	push	{r4, r5, lr}
 43e27d58:	e3a0204c 	mov	r2, #76	; 0x4c
 43e27d5c:	e59f1068 	ldr	r1, [pc, #104]	; 0x43e27dcc
 43e27d60:	e1a0000d 	mov	r0, sp
-43e27d64:	ebffeb3f 	bl	0x43e22a68
+43e27d64:	ebffeb3f 	bl	<memcpy>
 43e27d68:	e28d3fbe 	add	r3, sp, #760	; 0x2f8
 43e27d6c:	e0835105 	add	r5, r3, r5, lsl #2
 43e27d70:	e59f1058 	ldr	r1, [pc, #88]	; 0x43e27dd0

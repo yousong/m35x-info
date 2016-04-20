@@ -7559,6 +7559,7 @@ Disassembly of section .data:
 43e014e8:	43e36e3c 	mvnmi	r6, #60, 28	; 0x3c0
 43e014ec:	43e2e97a 	mvnmi	lr, #1998848	; 0x1e8000
 43e014f0:	43e36e5c 	mvnmi	r6, #92, 28	; 0x5c0
+
 43e014f4:	e92d4070 	push	{r4, r5, r6, lr}
 43e014f8:	e24dd088 	sub	sp, sp, #136	; 0x88
 43e014fc:	e1a06000 	mov	r6, r0
@@ -7576,17 +7577,17 @@ Disassembly of section .data:
 43e0152c:	ea00001e 	b	0x43e015ac
 43e01530:	e1a01004 	mov	r1, r4
 43e01534:	e59f0080 	ldr	r0, [pc, #128]	; 0x43e015bc	;; emmc open 0
-43e01538:	eb002ce8 	bl	0x43e0c8e0
+43e01538:	eb002ce8 	bl	<run_command>
 43e0153c:	e3a02101 	mov	r2, #1073741824	; 0x40000000
 43e01540:	e59f1078 	ldr	r1, [pc, #120]	; 0x43e015c0	;; movi r z f 0 0x%x
 43e01544:	e28d0008 	add	r0, sp, #8
 43e01548:	eb0088f0 	bl	0x43e23910
 43e0154c:	e1a01004 	mov	r1, r4
 43e01550:	e28d0008 	add	r0, sp, #8
-43e01554:	eb002ce1 	bl	0x43e0c8e0
+43e01554:	eb002ce1 	bl	<run_command>
 43e01558:	e1a01004 	mov	r1, r4
 43e0155c:	e59f0060 	ldr	r0, [pc, #96]	; 0x43e015c4	;; emmc close 0
-43e01560:	eb002cde 	bl	0x43e0c8e0
+43e01560:	eb002cde 	bl	<run_command>
 43e01564:	e2463c01 	sub	r3, r6, #256	; 0x100
 43e01568:	e3a02c01 	mov	r2, #256	; 0x100
 43e0156c:	e1a01006 	mov	r1, r6
@@ -8764,7 +8765,7 @@ Disassembly of section .data:
 43e027bc:	e59f0010 	ldr	r0, [pc, #16]	; 0x43e027d4	;; bootcmd
 43e027c0:	eb0016be 	bl	0x43e082c0
 43e027c4:	e1a01004 	mov	r1, r4	;; IRQs %s FIQs %s Mode %s%s
-43e027c8:	eb002844 	bl	0x43e0c8e0
+43e027c8:	eb002844 	bl	<run_command>
 43e027cc:	e1a00fa0 	lsr	r0, r0, #31
 43e027d0:	e8bd8010 	pop	{r4, pc}
 43e027d4:	43e2eecd 	mvnmi	lr, #3280	; 0xcd0
@@ -10694,7 +10695,7 @@ Disassembly of section .data:
 43e045e4:	eb007cc9 	bl	0x43e23910
 43e045e8:	e1a01004 	mov	r1, r4
 43e045ec:	e28d0058 	add	r0, sp, #88	; 0x58
-43e045f0:	eb0020ba 	bl	0x43e0c8e0
+43e045f0:	eb0020ba 	bl	<run_command>
 43e045f4:	e2505000 	subs	r5, r0, #0
 43e045f8:	059f05b8 	ldreq	r0, [pc, #1464]	; 0x43e04bb8	;; partition '%s' erased
 43e045fc:	01a01006 	moveq	r1, r6
@@ -10945,7 +10946,7 @@ Disassembly of section .data:
 43e049d0:	eb007bce 	bl	0x43e23910
 43e049d4:	e1a01007 	mov	r1, r7
 43e049d8:	e28d0058 	add	r0, sp, #88	; 0x58
-43e049dc:	eb001fbf 	bl	0x43e0c8e0
+43e049dc:	eb001fbf 	bl	<run_command>
 43e049e0:	e5943010 	ldr	r3, [r4, #16]
 43e049e4:	e5941014 	ldr	r1, [r4, #20]
 43e049e8:	e1a00005 	mov	r0, r5
@@ -10961,7 +10962,7 @@ Disassembly of section .data:
 43e04a10:	e2501000 	subs	r1, r0, #0
 43e04a14:	1a000001 	bne	0x43e04a20
 43e04a18:	e59f0208 	ldr	r0, [pc, #520]	; 0x43e04c28	;; emmc open 0
-43e04a1c:	eb001faf 	bl	0x43e0c8e0
+43e04a1c:	eb001faf 	bl	<run_command>
 43e04a20:	e5943010 	ldr	r3, [r4, #16]
 43e04a24:	e2866f7f 	add	r6, r6, #508	; 0x1fc
 43e04a28:	e5942014 	ldr	r2, [r4, #20]
@@ -10979,14 +10980,14 @@ Disassembly of section .data:
 43e04a58:	eb007bac 	bl	0x43e23910
 43e04a5c:	e3a01000 	mov	r1, #0
 43e04a60:	e28d0058 	add	r0, sp, #88	; 0x58
-43e04a64:	eb001f9d 	bl	0x43e0c8e0
+43e04a64:	eb001f9d 	bl	<run_command>
 43e04a68:	e59f119c 	ldr	r1, [pc, #412]	; 0x43e04c0c
 43e04a6c:	e1a00004 	mov	r0, r4
 43e04a70:	eb007702 	bl	0x43e22680
 43e04a74:	e2501000 	subs	r1, r0, #0
 43e04a78:	1a00002a 	bne	0x43e04b28
 43e04a7c:	e59f01ac 	ldr	r0, [pc, #428]	; 0x43e04c30	;; emmc close 0
-43e04a80:	eb001f96 	bl	0x43e0c8e0
+43e04a80:	eb001f96 	bl	<run_command>
 43e04a84:	ea000027 	b	0x43e04b28
 43e04a88:	e1a01004 	mov	r1, r4
 43e04a8c:	e59f01a0 	ldr	r0, [pc, #416]	; 0x43e04c34	;; flashing '%s' failed
@@ -11414,7 +11415,7 @@ Disassembly of section .data:
 43e05128:	eb0079f8 	bl	0x43e23910
 43e0512c:	e1a0000d 	mov	r0, sp
 43e05130:	e3a01000 	mov	r1, #0
-43e05134:	eb001de9 	bl	0x43e0c8e0
+43e05134:	eb001de9 	bl	<run_command>
 43e05138:	e59f3064 	ldr	r3, [pc, #100]	; 0x43e051a4
 43e0513c:	e5936000 	ldr	r6, [r3]
 43e05140:	e3560000 	cmp	r6, #0
@@ -11481,7 +11482,7 @@ Disassembly of section .data:
 43e05234:	e3a01000 	mov	r1, #0
 43e05238:	e59f0054 	ldr	r0, [pc, #84]	; 0x43e05294	;; emmc open 0
 43e0523c:	e2844f7f 	add	r4, r4, #508	; 0x1fc
-43e05240:	eb001da6 	bl	0x43e0c8e0
+43e05240:	eb001da6 	bl	<run_command>
 43e05244:	e2842003 	add	r2, r4, #3
 43e05248:	e59f1048 	ldr	r1, [pc, #72]	; 0x43e05298	;; mmc write 0 0x50000000 0 0x%x
 43e0524c:	e1a0000d 	mov	r0, sp
@@ -11489,10 +11490,10 @@ Disassembly of section .data:
 43e05254:	eb0079ad 	bl	0x43e23910
 43e05258:	e3a01000 	mov	r1, #0
 43e0525c:	e1a0000d 	mov	r0, sp
-43e05260:	eb001d9e 	bl	0x43e0c8e0
+43e05260:	eb001d9e 	bl	<run_command>
 43e05264:	e59f0030 	ldr	r0, [pc, #48]	; 0x43e0529c	;; emmc close 0
 43e05268:	e3a01000 	mov	r1, #0
-43e0526c:	eb001d9b 	bl	0x43e0c8e0
+43e0526c:	eb001d9b 	bl	<run_command>
 43e05270:	e59f0028 	ldr	r0, [pc, #40]	; 0x43e052a0	;; insdroid uboot complete!
 43e05274:	eb0010ec 	bl	<printf>
 43e05278:	e3a00000 	mov	r0, #0
@@ -11538,7 +11539,7 @@ Disassembly of section .data:
 43e05318:	ba000017 	blt	0x43e0537c
 43e0531c:	e59f0120 	ldr	r0, [pc, #288]	; 0x43e05444	;; movi write kernel 0 0x50000000
 43e05320:	e1a01005 	mov	r1, r5
-43e05324:	eb001d6d 	bl	0x43e0c8e0
+43e05324:	eb001d6d 	bl	<run_command>
 43e05328:	e59f0118 	ldr	r0, [pc, #280]	; 0x43e05448	;; insdroid kernel complete!
 43e0532c:	ea000012 	b	0x43e0537c
 43e05330:	e1a00004 	mov	r0, r4
@@ -11558,7 +11559,7 @@ Disassembly of section .data:
 43e05368:	ba000003 	blt	0x43e0537c
 43e0536c:	e59f00e0 	ldr	r0, [pc, #224]	; 0x43e05454	;; movi write rootfs 0 0x50000000 A00000
 43e05370:	e1a01005 	mov	r1, r5
-43e05374:	eb001d59 	bl	0x43e0c8e0
+43e05374:	eb001d59 	bl	<run_command>
 43e05378:	e59f00d8 	ldr	r0, [pc, #216]	; 0x43e05458	;; insdroid ramdisk complete!
 43e0537c:	eb0010aa 	bl	<printf>
 43e05380:	ea000029 	b	0x43e0542c
@@ -11598,7 +11599,7 @@ Disassembly of section .data:
 43e05408:	1affffdb 	bne	0x43e0537c
 43e0540c:	e1a01004 	mov	r1, r4
 43e05410:	e59f0050 	ldr	r0, [pc, #80]	; 0x43e05468	;; movi write recovery 0 0x50000000
-43e05414:	eb001d31 	bl	0x43e0c8e0
+43e05414:	eb001d31 	bl	<run_command>
 43e05418:	e59f004c 	ldr	r0, [pc, #76]	; 0x43e0546c	;; insdroid recovery complete!
 43e0541c:	eb001082 	bl	<printf>
 43e05420:	e1a05004 	mov	r5, r4
@@ -13535,7 +13536,7 @@ Disassembly of section .data:
 43e0724c:	eb0071af 	bl	0x43e23910
 43e07250:	e28d0014 	add	r0, sp, #20
 43e07254:	e1a01004 	mov	r1, r4
-43e07258:	eb0015a0 	bl	0x43e0c8e0
+43e07258:	eb0015a0 	bl	<run_command>
 43e0725c:	ea00011f 	b	0x43e076e0
 43e07260:	e3a05001 	mov	r5, #1
 43e07264:	e59a3008 	ldr	r3, [sl, #8]
@@ -13816,7 +13817,7 @@ Disassembly of section .data:
 43e076b0:	eb007096 	bl	0x43e23910
 43e076b4:	e28d0014 	add	r0, sp, #20
 43e076b8:	e1a01004 	mov	r1, r4
-43e076bc:	eb001487 	bl	0x43e0c8e0
+43e076bc:	eb001487 	bl	<run_command>
 43e076c0:	e59f0068 	ldr	r0, [pc, #104]	; 0x43e07730
 43e076c4:	eb0007d8 	bl	<printf>
 43e076c8:	ea000004 	b	0x43e076e0
@@ -14639,7 +14640,7 @@ Disassembly of section .data:
 43e0838c:	eb0004a6 	bl	<printf>
 43e08390:	e3a01000 	mov	r1, #0
 43e08394:	e1a0000d 	mov	r0, sp
-43e08398:	eb001150 	bl	0x43e0c8e0
+43e08398:	eb001150 	bl	<run_command>
 43e0839c:	e3a00205 	mov	r0, #1342177280	; 0x50000000
 43e083a0:	e59f10b4 	ldr	r1, [pc, #180]	; 0x43e0845c	;; ANDROID!
 43e083a4:	e3a02008 	mov	r2, #8
@@ -14716,7 +14717,7 @@ Disassembly of section .data:
 43e084c0:	eb000459 	bl	<printf>
 43e084c4:	e1a0000d 	mov	r0, sp
 43e084c8:	e3a01000 	mov	r1, #0
-43e084cc:	eb001103 	bl	0x43e0c8e0
+43e084cc:	eb001103 	bl	<run_command>
 43e084d0:	e28dd084 	add	sp, sp, #132	; 0x84
 43e084d4:	e8bd8000 	ldmfd	sp!, {pc}
 43e084d8:	43e3230c 	mvnmi	r2, #12, 6	; 0x30000000
@@ -19074,7 +19075,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0c8d4:	e28dde35 	add	sp, sp, #848	; 0x350
 43e0c8d8:	e8bd8ef0 	pop	{r4, r5, r6, r7, r9, sl, fp, pc}
 43e0c8dc:	43e331ea 	mvnmi	r3, #-2147483590	; 0x8000003a
-43e0c8e0:	e92d4008 	push	{r3, lr}
+run_command:	e92d4008 	push	{r3, lr}
 43e0c8e4:	ebffff36 	bl	0x43e0c5c4
 43e0c8e8:	e3700001 	cmn	r0, #1
 43e0c8ec:	13a00000 	movne	r0, #0
@@ -19135,7 +19136,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0c9c8:	1a000002 	bne	0x43e0c9d8
 43e0c9cc:	e1a00006 	mov	r0, r6	;; bootcmd
 43e0c9d0:	e1a01005 	mov	r1, r5
-43e0c9d4:	ebffffc1 	bl	0x43e0c8e0
+43e0c9d4:	ebffffc1 	bl	<run_command>
 43e0c9d8:	e59f4070 	ldr	r4, [pc, #112]	; 0x43e0ca50
 43e0c9dc:	e3a06001 	mov	r6, #1
 43e0c9e0:	e3a05000 	mov	r5, #0
@@ -19157,7 +19158,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0ca20:	e2711001 	rsbs	r1, r1, #1
 43e0ca24:	33a01000 	movcc	r1, #0
 43e0ca28:	e59f0028 	ldr	r0, [pc, #40]	; 0x43e0ca58
-43e0ca2c:	ebffffab 	bl	0x43e0c8e0
+43e0ca2c:	ebffffab 	bl	<run_command>
 43e0ca30:	e1a06000 	mov	r6, r0
 43e0ca34:	e3560000 	cmp	r6, #0
 43e0ca38:	d5445a83 	strble	r5, [r4, #-2691]	; 0xfffff57d
@@ -19294,7 +19295,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0cc44:	ebfff278 	bl	<printf>
 43e0cc48:	e59f0338 	ldr	r0, [pc, #824]	; 0x43e0cf88	;; fastboot
 43e0cc4c:	e3a01000 	mov	r1, #0
-43e0cc50:	ebffff22 	bl	0x43e0c8e0
+43e0cc50:	ebffff22 	bl	<run_command>
 43e0cc54:	eb000f7e 	bl	0x43e10a54
 43e0cc58:	e3500000 	cmp	r0, #0
 43e0cc5c:	0a000009 	beq	0x43e0cc88
@@ -19354,7 +19355,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0cd34:	ebfff23c 	bl	<printf>
 43e0cd38:	e59f0248 	ldr	r0, [pc, #584]	; 0x43e0cf88	;; fastboot
 43e0cd3c:	e1a01005 	mov	r1, r5
-43e0cd40:	ebfffee6 	bl	0x43e0c8e0
+43e0cd40:	ebfffee6 	bl	<run_command>
 43e0cd44:	eb001b15 	bl	0x43e139a0
 43e0cd48:	e1a05000 	mov	r5, r0	;; fastboot
 43e0cd4c:	e1a04000 	mov	r4, r0	;; fastboot
@@ -19370,7 +19371,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0cd74:	e2501000 	subs	r1, r0, #0
 43e0cd78:	1a000002 	bne	0x43e0cd88
 43e0cd7c:	e59f022c 	ldr	r0, [pc, #556]	; 0x43e0cfb0	;; poweroff
-43e0cd80:	ebfffed6 	bl	0x43e0c8e0
+43e0cd80:	ebfffed6 	bl	<run_command>
 43e0cd84:	eafffffe 	b	0x43e0cd84
 43e0cd88:	e3007c7f 	tst	r0, #32512	; 0x7f00
 43e0cd8c:	e1550007 	cmp	r5, r7
@@ -19399,7 +19400,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0cde8:	e2501000 	subs	r1, r0, #0
 43e0cdec:	1a000001 	bne	0x43e0cdf8
 43e0cdf0:	e59f01b8 	ldr	r0, [pc, #440]	; 0x43e0cfb0	;; poweroff
-43e0cdf4:	ebfffeb9 	bl	0x43e0c8e0
+43e0cdf4:	ebfffeb9 	bl	<run_command>
 43e0cdf8:	e1540005 	cmp	r4, r5
 43e0cdfc:	9affffea 	bls	0x43e0cdac
 43e0ce00:	eb006cc4 	bl	0x43e28118
@@ -19493,7 +19494,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0cf60:	e59f005c 	ldr	r0, [pc, #92]	; 0x43e0cfc4	;; bootr
 43e0cf64:	e3a01000 	mov	r1, #0
 43e0cf68:	e8bd40f8 	pop	{r3, r4, r5, r6, r7, lr}
-43e0cf6c:	eafffe5b 	b	0x43e0c8e0
+43e0cf6c:	eafffe5b 	b	<run_command>
 43e0cf70:	10040000 	andne	r0, r4, r0
 43e0cf74:	43e3326f 	mvnmi	r3, #-268435450	; 0xf0000006
 43e0cf78:	43e33281 	mvnmi	r3, #268435464	; 0x10000008

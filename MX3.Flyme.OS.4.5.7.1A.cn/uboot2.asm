@@ -7560,10 +7560,10 @@ Disassembly of section .data:
 43e014ec:	43e2e97a 	mvnmi	lr, #1998848	; 0x1e8000
 43e014f0:	43e36e5c 	mvnmi	r6, #92, 28	; 0x5c0
 
-43e014f4:	e92d4070 	push	{r4, r5, r6, lr}
+check_signature:	e92d4070 	push	{r4, r5, r6, lr}
 43e014f8:	e24dd088 	sub	sp, sp, #136	; 0x88
-43e014fc:	e1a06000 	mov	r6, r0
-43e01500:	e1a05001 	mov	r5, r1
+43e014fc:	e1a06000 	mov	r6, r0							;; r6 = r0 = baseaddr
+43e01500:	e1a05001 	mov	r5, r1							;; r5 = r1 = size
 43e01504:	eb0098c3 	bl	0x43e27818
 43e01508:	e5d04154 	ldrb	r4, [r0, #340]	; 0x154
 43e0150c:	e3540000 	cmp	r4, #0
@@ -7580,8 +7580,8 @@ Disassembly of section .data:
 43e01538:	eb002ce8 	bl	<run_command>
 43e0153c:	e3a02101 	mov	r2, #1073741824	; 0x40000000
 43e01540:	e59f1078 	ldr	r1, [pc, #120]	; 0x43e015c0	;; movi r z f 0 0x%x
-43e01544:	e28d0008 	add	r0, sp, #8
-43e01548:	eb0088f0 	bl	0x43e23910
+43e01544:	e28d0008 	add	r0, sp, #8						;; buf_cmd
+43e01548:	eb0088f0 	bl	<sprintf>						;; movi read zero fwbl1 0 0x40000000
 43e0154c:	e1a01004 	mov	r1, r4
 43e01550:	e28d0008 	add	r0, sp, #8
 43e01554:	eb002ce1 	bl	<run_command>
@@ -7590,12 +7590,12 @@ Disassembly of section .data:
 43e01560:	eb002cde 	bl	<run_command>
 43e01564:	e2463c01 	sub	r3, r6, #256	; 0x100
 43e01568:	e3a02c01 	mov	r2, #256	; 0x100
-43e0156c:	e1a01006 	mov	r1, r6
-43e01570:	e58d2000 	str	r2, [sp]
-43e01574:	e0833005 	add	r3, r3, r5
-43e01578:	e59f0048 	ldr	r0, [pc, #72]	; 0x43e015c8
+43e0156c:	e1a01006 	mov	r1, r6							;; r6 = arg_baseaddr
+43e01570:	e58d2000 	str	r2, [sp]						;; _arg4 passed by stack
+43e01574:	e0833005 	add	r3, r3, r5						;; r3 = sigbase
+43e01578:	e59f0048 	ldr	r0, [pc, #72]	; 0x43e015c8	;; 0x40003800
 43e0157c:	e2452c01 	sub	r2, r5, #256	; 0x100
-43e01580:	eb00aaec 	bl	0x43e2c138
+43e01580:	eb00aaec 	bl	<_check_signature>				;; (sbctx, dbase, dsize, sigbase, 256)
 43e01584:	e2501000 	subs	r1, r0, #0
 43e01588:	0a000003 	beq	0x43e0159c
 43e0158c:	e59f0038 	ldr	r0, [pc, #56]	; 0x43e015cc	;; Integrity check fail(0x%X).
@@ -7616,26 +7616,26 @@ Disassembly of section .data:
 43e015c8:	40003800 	andmi	r3, r0, r0, lsl #16
 43e015cc:	43e2e9e3 	mvnmi	lr, #3719168	; 0x38c000
 
-43e015d0:	e92d4010 	push	{r4, lr}
+security_check:	e92d4010 	push	{r4, lr}
 43e015d4:	eb00988f 	bl	0x43e27818
 43e015d8:	e5d03154 	ldrb	r3, [r0, #340]	; 0x154
 43e015dc:	e3530000 	cmp	r3, #0
 43e015e0:	159f0058 	ldrne	r0, [pc, #88]	; 0x43e01640	;; signature check disabled, bootloader had been unlocked
 43e015e4:	1a000013 	bne	0x43e01638
-43e015e8:	e59f4054 	ldr	r4, [pc, #84]	; 0x43e01644
-43e015ec:	e59f0054 	ldr	r0, [pc, #84]	; 0x43e01648
-43e015f0:	e5941000 	ldr	r1, [r4]
-43e015f4:	ebffffbe 	bl	0x43e014f4
+43e015e8:	e59f4054 	ldr	r4, [pc, #84]	; 0x43e01644		;; [] = 43e35bf0
+43e015ec:	e59f0054 	ldr	r0, [pc, #84]	; 0x43e01648		;; 40008000
+43e015f0:	e5941000 	ldr	r1, [r4]							;; [43e35bf0], offset 0x3d7f0, 0x800000, 8MB
+43e015f4:	ebffffbe 	bl	<check_signature>
 43e015f8:	e3500000 	cmp	r0, #0
 43e015fc:	0a000002 	beq	0x43e0160c
-43e01600:	e59f0044 	ldr	r0, [pc, #68]	; 0x43e0164c	;; Kernel Integrity check fail
+43e01600:	e59f0044 	ldr	r0, [pc, #68]	; 0x43e0164c	;; Kernel Integrity check fail\nSystem Halt...
 43e01604:	eb002008 	bl	<printf>
 43e01608:	eafffffe 	b	0x43e01608
 43e0160c:	e59f003c 	ldr	r0, [pc, #60]	; 0x43e01650	;; Kernel Integrity check success.
 43e01610:	eb002005 	bl	<printf>
 43e01614:	e3a00442 	mov	r0, #1107296256	; 0x42000000
 43e01618:	e5941004 	ldr	r1, [r4, #4]
-43e0161c:	ebffffb4 	bl	0x43e014f4
+43e0161c:	ebffffb4 	bl	<check_signature>
 43e01620:	e3500000 	cmp	r0, #0
 43e01624:	059f0028 	ldreq	r0, [pc, #40]	; 0x43e01654	;; rootfs Integrity check success.
 43e01628:	0a000002 	beq	0x43e01638
@@ -7651,8 +7651,9 @@ Disassembly of section .data:
 43e01650:	43e2ea2c 	mvnmi	lr, #44, 20	; 0x2c000
 43e01654:	43e2ea79 	mvnmi	lr, #495616	; 0x79000
 43e01658:	43e2ea4d 	mvnmi	lr, #315392	; 0x4d000
+
 43e0165c:	e3520000 	cmp	r2, #0
-43e01660:	e1a0c000 	mov	ip, r0	;; rootfs Integrity check fail
+43e01660:	e1a0c000 	mov	ip, r0
 43e01664:	e92d4070 	push	{r4, r5, r6, lr}
 43e01668:	1a000006 	bne	0x43e01688
 43e0166c:	e3530000 	cmp	r3, #0
@@ -8781,7 +8782,7 @@ Disassembly of section .data:
 43e027e4:	e1a04003 	mov	r4, r3
 43e027e8:	e1a07001 	mov	r7, r1
 43e027ec:	e1a06000 	mov	r6, r0
-43e027f0:	ebfffb76 	bl	0x43e015d0				;; security_check()
+43e027f0:	ebfffb76 	bl	<security_check>				;; security_check()
 43e027f4:	e3a01000 	mov	r1, #0
 43e027f8:	e3a02f4b 	mov	r2, #300	; 0x12c
 43e027fc:	e28d0014 	add	r0, sp, #20
@@ -9335,14 +9336,14 @@ Disassembly of section .data:
 43e0308c:	e5942070 	ldr	r2, [r4, #112]	; 0x70
 43e03090:	e28d001c 	add	r0, sp, #28
 43e03094:	e59f10e4 	ldr	r1, [pc, #228]	; 0x43e03180
-43e03098:	eb00821c 	bl	0x43e23910
+43e03098:	eb00821c 	bl	<sprintf>
 43e0309c:	e28d101c 	add	r1, sp, #28
 43e030a0:	e59f00dc 	ldr	r0, [pc, #220]	; 0x43e03184	;; initrd_start
 43e030a4:	eb001380 	bl	0x43e07eac
 43e030a8:	e28d001c 	add	r0, sp, #28
 43e030ac:	e59f10cc 	ldr	r1, [pc, #204]	; 0x43e03180
 43e030b0:	e5942074 	ldr	r2, [r4, #116]	; 0x74
-43e030b4:	eb008215 	bl	0x43e23910
+43e030b4:	eb008215 	bl	<sprintf>
 43e030b8:	e28d101c 	add	r1, sp, #28
 43e030bc:	e59f00c4 	ldr	r0, [pc, #196]	; 0x43e03188	;; initrd_end
 43e030c0:	eb001379 	bl	0x43e07eac
@@ -9407,7 +9408,7 @@ Disassembly of section .data:
 43e031ac:	e1a05003 	mov	r5, r3
 43e031b0:	e3a03000 	mov	r3, #0
 43e031b4:	e58d3018 	str	r3, [sp, #24]
-43e031b8:	ebfff904 	bl	0x43e015d0
+43e031b8:	ebfff904 	bl	<security_check>
 43e031bc:	e3560001 	cmp	r6, #1
 43e031c0:	da000010 	ble	0x43e03208
 43e031c4:	e5950004 	ldr	r0, [r5, #4]
@@ -9507,7 +9508,7 @@ Disassembly of section .data:
 43e0333c:	e28d0020 	add	r0, sp, #32
 43e03340:	e59f10dc 	ldr	r1, [pc, #220]	; 0x43e03424
 43e03344:	e5932054 	ldr	r2, [r3, #84]	; 0x54
-43e03348:	eb008170 	bl	0x43e23910
+43e03348:	eb008170 	bl	<sprintf>
 43e0334c:	e59f00d4 	ldr	r0, [pc, #212]	; 0x43e03428	;; filesize
 43e03350:	e28d1020 	add	r1, sp, #32
 43e03354:	eb0012d4 	bl	0x43e07eac
@@ -9765,7 +9766,7 @@ Disassembly of section .data:
 43e03744:	e59f106c 	ldr	r1, [pc, #108]	; 0x43e037b8
 43e03748:	e1a02009 	mov	r2, r9	;; bootfile
 43e0374c:	e28d0018 	add	r0, sp, #24
-43e03750:	eb00806e 	bl	0x43e23910
+43e03750:	eb00806e 	bl	<sprintf>
 43e03754:	e59f0060 	ldr	r0, [pc, #96]	; 0x43e037bc	;; filesize
 43e03758:	e28d1018 	add	r1, sp, #24
 43e0375c:	eb0011d2 	bl	0x43e07eac
@@ -10087,7 +10088,7 @@ Disassembly of section .data:
 43e03c4c:	1a000003 	bne	0x43e03c60
 43e03c50:	e59d0014 	ldr	r0, [sp, #20]
 43e03c54:	e59f1014 	ldr	r1, [pc, #20]	; 0x43e03c70	;; No variables set
-43e03c58:	eb007f2c 	bl	0x43e23910
+43e03c58:	eb007f2c 	bl	<sprintf>
 43e03c5c:	e3a00001 	mov	r0, #1
 43e03c60:	e28dd018 	add	sp, sp, #24
 43e03c64:	e8bd8ef0 	pop	{r4, r5, r6, r7, r9, sl, fp, pc}
@@ -10237,7 +10238,7 @@ Disassembly of section .data:
 43e03ea4:	e5846290 	str	r6, [r4, #656]	; 0x290
 43e03ea8:	e28d0018 	add	r0, sp, #24
 43e03eac:	e1a09003 	mov	r9, r3
-43e03eb0:	eb007e96 	bl	0x43e23910
+43e03eb0:	eb007e96 	bl	<sprintf>
 43e03eb4:	e584600c 	str	r6, [r4, #12]
 43e03eb8:	e1a0000a 	mov	r0, sl
 43e03ebc:	e59f13e0 	ldr	r1, [pc, #992]	; 0x43e042a4
@@ -10542,7 +10543,7 @@ Disassembly of section .data:
 43e04368:	e1a07000 	mov	r7, r0
 43e0436c:	e59f17ec 	ldr	r1, [pc, #2028]	; 0x43e04b60	;; FAIL
 43e04370:	e28d0014 	add	r0, sp, #20
-43e04374:	eb007d65 	bl	0x43e23910
+43e04374:	eb007d65 	bl	<sprintf>
 43e04378:	e1a00007 	mov	r0, r7
 43e0437c:	e59f17e0 	ldr	r1, [pc, #2016]	; 0x43e04b64	;; reboot
 43e04380:	e3a02006 	mov	r2, #6
@@ -10559,7 +10560,7 @@ Disassembly of section .data:
 43e043ac:	e59f17bc 	ldr	r1, [pc, #1980]	; 0x43e04b70	;; OKAY
 43e043b0:	e28d0014 	add	r0, sp, #20
 43e043b4:	e5834290 	str	r4, [r3, #656]	; 0x290
-43e043b8:	eb007d54 	bl	0x43e23910
+43e043b8:	eb007d54 	bl	<sprintf>
 43e043bc:	e28d0014 	add	r0, sp, #20
 43e043c0:	eb0078e0 	bl	0x43e22748
 43e043c4:	e1a02004 	mov	r2, r4
@@ -10575,7 +10576,7 @@ Disassembly of section .data:
 43e043ec:	eb007977 	bl	0x43e229d0
 43e043f0:	e59f1778 	ldr	r1, [pc, #1912]	; 0x43e04b70	;; OKAY
 43e043f4:	e28d0014 	add	r0, sp, #20
-43e043f8:	eb007d44 	bl	0x43e23910
+43e043f8:	eb007d44 	bl	<sprintf>
 43e043fc:	e28d0014 	add	r0, sp, #20
 43e04400:	eb0078d0 	bl	0x43e22748
 43e04404:	e3a02001 	mov	r2, #1
@@ -10637,7 +10638,7 @@ Disassembly of section .data:
 43e044e4:	0a000186 	beq	0x43e04b04
 43e044e8:	e28d0018 	add	r0, sp, #24
 43e044ec:	e59f169c 	ldr	r1, [pc, #1692]	; 0x43e04b90
-43e044f0:	eb007d06 	bl	0x43e23910
+43e044f0:	eb007d06 	bl	<sprintf>
 43e044f4:	e1a0400a 	mov	r4, sl
 43e044f8:	ea000181 	b	0x43e04b04
 43e044fc:	e1a00007 	mov	r0, r7
@@ -10657,7 +10658,7 @@ Disassembly of section .data:
 43e04534:	1a000004 	bne	0x43e0454c
 43e04538:	e28d0014 	add	r0, sp, #20
 43e0453c:	e59f1654 	ldr	r1, [pc, #1620]	; 0x43e04b98	;; FAILpartition does not exist
-43e04540:	eb007cf2 	bl	0x43e23910
+43e04540:	eb007cf2 	bl	<sprintf>
 43e04544:	e1a04006 	mov	r4, r6
 43e04548:	ea00016d 	b	0x43e04b04
 43e0454c:	e59f1648 	ldr	r1, [pc, #1608]	; 0x43e04b9c
@@ -10698,7 +10699,7 @@ Disassembly of section .data:
 43e045d8:	e58d0004 	str	r0, [sp, #4]
 43e045dc:	e28d0058 	add	r0, sp, #88	; 0x58
 43e045e0:	e59f15cc 	ldr	r1, [pc, #1484]	; 0x43e04bb4	;; mmc erase user 0 0x%llx 0x%llx
-43e045e4:	eb007cc9 	bl	0x43e23910
+43e045e4:	eb007cc9 	bl	<sprintf>
 43e045e8:	e1a01004 	mov	r1, r4
 43e045ec:	e28d0058 	add	r0, sp, #88	; 0x58
 43e045f0:	eb0020ba 	bl	<run_command>
@@ -10708,7 +10709,7 @@ Disassembly of section .data:
 43e04600:	0a00008a 	beq	0x43e04830
 43e04604:	e59f15b0 	ldr	r1, [pc, #1456]	; 0x43e04bbc	;; FAILfailed to erase partition
 43e04608:	e28d0014 	add	r0, sp, #20
-43e0460c:	eb007cbf 	bl	0x43e23910
+43e0460c:	eb007cbf 	bl	<sprintf>
 43e04610:	ea00013b 	b	0x43e04b04
 43e04614:	e1a00007 	mov	r0, r7
 43e04618:	e59f15a0 	ldr	r1, [pc, #1440]	; 0x43e04bc0	;; download:
@@ -10738,11 +10739,11 @@ Disassembly of section .data:
 43e04678:	e59f154c 	ldr	r1, [pc, #1356]	; 0x43e04bcc	;; FAILdata too large
 43e0467c:	e28d0014 	add	r0, sp, #20
 43e04680:	e5854000 	str	r4, [r5]
-43e04684:	eb007ca1 	bl	0x43e23910
+43e04684:	eb007ca1 	bl	<sprintf>
 43e04688:	ea000002 	b	0x43e04698
 43e0468c:	e28d0014 	add	r0, sp, #20
 43e04690:	e59f1538 	ldr	r1, [pc, #1336]	; 0x43e04bd0	;; DATA%08x
-43e04694:	eb007c9d 	bl	0x43e23910
+43e04694:	eb007c9d 	bl	<sprintf>
 43e04698:	e28d0014 	add	r0, sp, #20
 43e0469c:	e59f74c8 	ldr	r7, [pc, #1224]	; 0x43e04b6c
 43e046a0:	eb007828 	bl	0x43e22748
@@ -10764,13 +10765,13 @@ Disassembly of section .data:
 43e046e0:	e28d0014 	add	r0, sp, #20
 43e046e4:	0a000005 	beq	0x43e04700
 43e046e8:	e59f14e8 	ldr	r1, [pc, #1256]	; 0x43e04bd8	;; ERROR
-43e046ec:	eb007c87 	bl	0x43e23910
+43e046ec:	eb007c87 	bl	<sprintf>
 43e046f0:	e5971000 	ldr	r1, [r7]
 43e046f4:	e59f04e0 	ldr	r0, [pc, #1248]	; 0x43e04bdc
 43e046f8:	eb0013cb 	bl	<printf>
 43e046fc:	ea000115 	b	0x43e04b58
 43e04700:	e59f1468 	ldr	r1, [pc, #1128]	; 0x43e04b70	;; OKAY
-43e04704:	eb007c81 	bl	0x43e23910
+43e04704:	eb007c81 	bl	<sprintf>
 43e04708:	e59f04d0 	ldr	r0, [pc, #1232]	; 0x43e04be0
 43e0470c:	e5971000 	ldr	r1, [r7]
 43e04710:	eb0013c5 	bl	<printf>
@@ -10794,7 +10795,7 @@ Disassembly of section .data:
 43e04758:	0a000004 	beq	0x43e04770
 43e0475c:	e59f1448 	ldr	r1, [pc, #1096]	; 0x43e04bac	;; FAILsystem locked
 43e04760:	e28d0014 	add	r0, sp, #20
-43e04764:	eb007c69 	bl	0x43e23910
+43e04764:	eb007c69 	bl	<sprintf>
 43e04768:	e1a04005 	mov	r4, r5
 43e0476c:	ea0000e4 	b	0x43e04b04
 43e04770:	e2870006 	add	r0, r7, #6
@@ -10823,7 +10824,7 @@ Disassembly of section .data:
 43e047cc:	e59f141c 	ldr	r1, [pc, #1052]	; 0x43e04bf0
 43e047d0:	e28d0058 	add	r0, sp, #88	; 0x58
 43e047d4:	e59f2418 	ldr	r2, [pc, #1048]	; 0x43e04bf4	;; Unknown Error
-43e047d8:	eb007c4c 	bl	0x43e23910
+43e047d8:	eb007c4c 	bl	<sprintf>
 43e047dc:	e28d0058 	add	r0, sp, #88	; 0x58
 43e047e0:	e3a01000 	mov	r1, #0
 43e047e4:	ebfffc9a 	bl	0x43e03a54
@@ -10843,7 +10844,7 @@ Disassembly of section .data:
 43e0481c:	e28d0014 	add	r0, sp, #20
 43e04820:	e59f13d8 	ldr	r1, [pc, #984]	; 0x43e04c00	;; FAIL%s
 43e04824:	e28d2058 	add	r2, sp, #88	; 0x58
-43e04828:	eb007c38 	bl	0x43e23910
+43e04828:	eb007c38 	bl	<sprintf>
 43e0482c:	ea0000c9 	b	0x43e04b58
 43e04830:	eb00137d 	bl	<printf>
 43e04834:	e28d0014 	add	r0, sp, #20
@@ -10878,7 +10879,7 @@ Disassembly of section .data:
 43e048a8:	ea000076 	b	0x43e04a88
 43e048ac:	e1a00005 	mov	r0, r5
 43e048b0:	e1a01006 	mov	r1, r6
-43e048b4:	ebfff30e 	bl	0x43e014f4
+43e048b4:	ebfff30e 	bl	<check_signature>
 43e048b8:	e3500000 	cmp	r0, #0
 43e048bc:	ba000029 	blt	0x43e04968
 43e048c0:	e1a02b06 	lsl	r2, r6, #22
@@ -10899,7 +10900,7 @@ Disassembly of section .data:
 43e048fc:	e5950024 	ldr	r0, [r5, #36]	; 0x24
 43e04900:	e5951008 	ldr	r1, [r5, #8]
 43e04904:	e0850000 	add	r0, r5, r0
-43e04908:	ebfff2f9 	bl	0x43e014f4
+43e04908:	ebfff2f9 	bl	<check_signature>
 43e0490c:	e3500000 	cmp	r0, #0
 43e04910:	159f0304 	ldrne	r0, [pc, #772]	; 0x43e04c1c	;; Recovery Kernel check signature failed!
 43e04914:	1a00000c 	bne	0x43e0494c
@@ -10912,7 +10913,7 @@ Disassembly of section .data:
 43e04930:	e0800002 	add	r0, r0, r2
 43e04934:	e0800005 	add	r0, r0, r5
 43e04938:	e0000003 	and	r0, r0, r3
-43e0493c:	ebfff2ec 	bl	0x43e014f4
+43e0493c:	ebfff2ec 	bl	<check_signature>
 43e04940:	e3500000 	cmp	r0, #0
 43e04944:	0a00000b 	beq	0x43e04978
 43e04948:	e59f02d0 	ldr	r0, [pc, #720]	; 0x43e04c20	;; Recovery Ramdisk check signature failed!
@@ -10920,7 +10921,7 @@ Disassembly of section .data:
 43e04950:	ea00007a 	b	0x43e04b40
 43e04954:	e1a00005 	mov	r0, r5
 43e04958:	e1a01006 	mov	r1, r6
-43e0495c:	ebfff2e4 	bl	0x43e014f4
+43e0495c:	ebfff2e4 	bl	<check_signature>
 43e04960:	e3500000 	cmp	r0, #0
 43e04964:	aa000003 	bge	0x43e04978
 43e04968:	e1a01004 	mov	r1, r4
@@ -10949,7 +10950,7 @@ Disassembly of section .data:
 43e049c4:	e58d2004 	str	r2, [sp, #4]
 43e049c8:	e18e2b8c 	orr	r2, lr, ip, lsl #23
 43e049cc:	e59f11e0 	ldr	r1, [pc, #480]	; 0x43e04bb4	;; mmc erase user 0 0x%llx 0x%llx
-43e049d0:	eb007bce 	bl	0x43e23910
+43e049d0:	eb007bce 	bl	<sprintf>
 43e049d4:	e1a01007 	mov	r1, r7
 43e049d8:	e28d0058 	add	r0, sp, #88	; 0x58
 43e049dc:	eb001fbf 	bl	<run_command>
@@ -10983,7 +10984,7 @@ Disassembly of section .data:
 43e04a4c:	e1a02005 	mov	r2, r5
 43e04a50:	e58d3000 	str	r3, [sp]
 43e04a54:	e58d6008 	str	r6, [sp, #8]
-43e04a58:	eb007bac 	bl	0x43e23910
+43e04a58:	eb007bac 	bl	<sprintf>
 43e04a5c:	e3a01000 	mov	r1, #0
 43e04a60:	e28d0058 	add	r0, sp, #88	; 0x58
 43e04a64:	eb001f9d 	bl	<run_command>
@@ -11010,7 +11011,7 @@ Disassembly of section .data:
 43e04ab8:	1a000011 	bne	0x43e04b04
 43e04abc:	e59f117c 	ldr	r1, [pc, #380]	; 0x43e04c40	;; INFOunknown OEM command
 43e04ac0:	e28d0014 	add	r0, sp, #20
-43e04ac4:	eb007b91 	bl	0x43e23910
+43e04ac4:	eb007b91 	bl	<sprintf>
 43e04ac8:	e28d0014 	add	r0, sp, #20
 43e04acc:	eb00771d 	bl	0x43e22748
 43e04ad0:	e1a02004 	mov	r2, r4
@@ -11019,7 +11020,7 @@ Disassembly of section .data:
 43e04adc:	eb004462 	bl	0x43e15c6c
 43e04ae0:	e59f1088 	ldr	r1, [pc, #136]	; 0x43e04b70	;; OKAY
 43e04ae4:	e28d0014 	add	r0, sp, #20
-43e04ae8:	eb007b88 	bl	0x43e23910
+43e04ae8:	eb007b88 	bl	<sprintf>
 43e04aec:	e28d0014 	add	r0, sp, #20
 43e04af0:	eb007714 	bl	0x43e22748
 43e04af4:	e1a02004 	mov	r2, r4
@@ -11046,7 +11047,7 @@ Disassembly of section .data:
 43e04b48:	eb0012b7 	bl	<printf>
 43e04b4c:	e59f10f4 	ldr	r1, [pc, #244]	; 0x43e04c48	;; FAILfailed to flash partition, signature error
 43e04b50:	e28d0014 	add	r0, sp, #20
-43e04b54:	eb007b6d 	bl	0x43e23910
+43e04b54:	eb007b6d 	bl	<sprintf>
 43e04b58:	e3a04000 	mov	r4, #0
 43e04b5c:	eaffffe8 	b	0x43e04b04
 43e04b60:	43e2fe1a 	mvnmi	pc, #416	; 0x1a0
@@ -11380,7 +11381,7 @@ Disassembly of section .data:
 43e05080:	e59f1038 	ldr	r1, [pc, #56]	; 0x43e050c0
 43e05084:	e1a02004 	mov	r2, r4
 43e05088:	e28d000c 	add	r0, sp, #12
-43e0508c:	eb007a1f 	bl	0x43e23910
+43e0508c:	eb007a1f 	bl	<sprintf>
 43e05090:	e59f002c 	ldr	r0, [pc, #44]	; 0x43e050c4	;; filesize
 43e05094:	e28d100c 	add	r1, sp, #12
 43e05098:	eb000b83 	bl	0x43e07eac
@@ -11418,7 +11419,7 @@ Disassembly of section .data:
 43e0511c:	e1a05001 	mov	r5, r1
 43e05120:	e1a0000d 	mov	r0, sp
 43e05124:	e59f1074 	ldr	r1, [pc, #116]	; 0x43e051a0	;; dnw 0x%X
-43e05128:	eb0079f8 	bl	0x43e23910
+43e05128:	eb0079f8 	bl	<sprintf>
 43e0512c:	e1a0000d 	mov	r0, sp
 43e05130:	e3a01000 	mov	r1, #0
 43e05134:	eb001de9 	bl	<run_command>
@@ -11472,7 +11473,7 @@ Disassembly of section .data:
 43e051f4:	1a00001e 	bne	0x43e05274
 43e051f8:	e3a00205 	mov	r0, #1342177280	; 0x50000000
 43e051fc:	e1a01004 	mov	r1, r4
-43e05200:	ebfff0bb 	bl	0x43e014f4
+43e05200:	ebfff0bb 	bl	<check_signature>
 43e05204:	e3500000 	cmp	r0, #0
 43e05208:	b59f0080 	ldrlt	r0, [pc, #128]	; 0x43e05290	;; uboot check signature failed!
 43e0520c:	ba000018 	blt	0x43e05274
@@ -11493,7 +11494,7 @@ Disassembly of section .data:
 43e05248:	e59f1048 	ldr	r1, [pc, #72]	; 0x43e05298	;; mmc write 0 0x50000000 0 0x%x
 43e0524c:	e1a0000d 	mov	r0, sp
 43e05250:	e1a024a2 	lsr	r2, r2, #9
-43e05254:	eb0079ad 	bl	0x43e23910
+43e05254:	eb0079ad 	bl	<sprintf>
 43e05258:	e3a01000 	mov	r1, #0
 43e0525c:	e1a0000d 	mov	r0, sp
 43e05260:	eb001d9e 	bl	<run_command>
@@ -11539,7 +11540,7 @@ Disassembly of section .data:
 43e05300:	e2501000 	subs	r1, r0, #0
 43e05304:	0a000047 	beq	0x43e05428
 43e05308:	e3a00205 	mov	r0, #1342177280	; 0x50000000
-43e0530c:	ebfff078 	bl	0x43e014f4
+43e0530c:	ebfff078 	bl	<check_signature>
 43e05310:	e3500000 	cmp	r0, #0
 43e05314:	b59f0124 	ldrlt	r0, [pc, #292]	; 0x43e05440	;; kernel check signature failed!
 43e05318:	ba000017 	blt	0x43e0537c
@@ -11559,7 +11560,7 @@ Disassembly of section .data:
 43e05350:	e2501000 	subs	r1, r0, #0
 43e05354:	0a000033 	beq	0x43e05428
 43e05358:	e3a00205 	mov	r0, #1342177280	; 0x50000000
-43e0535c:	ebfff064 	bl	0x43e014f4
+43e0535c:	ebfff064 	bl	<check_signature>
 43e05360:	e3500000 	cmp	r0, #0
 43e05364:	b59f00e4 	ldrlt	r0, [pc, #228]	; 0x43e05450	;; ramdisk check signature failed!
 43e05368:	ba000003 	blt	0x43e0537c
@@ -11584,7 +11585,7 @@ Disassembly of section .data:
 43e053b4:	e5940024 	ldr	r0, [r4, #36]	; 0x24
 43e053b8:	e5941008 	ldr	r1, [r4, #8]
 43e053bc:	e0800004 	add	r0, r0, r4
-43e053c0:	ebfff04b 	bl	0x43e014f4
+43e053c0:	ebfff04b 	bl	<check_signature>
 43e053c4:	e2505000 	subs	r5, r0, #0
 43e053c8:	0a000003 	beq	0x43e053dc
 43e053cc:	e59f008c 	ldr	r0, [pc, #140]	; 0x43e05460	;; Recovery Kernel Integrity check fail
@@ -11599,7 +11600,7 @@ Disassembly of section .data:
 43e053f0:	e240021b 	sub	r0, r0, #-1342177279	; 0xb0000001
 43e053f4:	e0800002 	add	r0, r0, r2
 43e053f8:	e0000003 	and	r0, r0, r3
-43e053fc:	ebfff03c 	bl	0x43e014f4
+43e053fc:	ebfff03c 	bl	<check_signature>
 43e05400:	e2504000 	subs	r4, r0, #0
 43e05404:	159f0058 	ldrne	r0, [pc, #88]	; 0x43e05464	;; Recovery Ramdisk Integrity check fail
 43e05408:	1affffdb 	bne	0x43e0537c
@@ -13539,7 +13540,7 @@ Disassembly of section .data:
 43e07240:	e59f14a4 	ldr	r1, [pc, #1188]	; 0x43e076ec	;; mmcinfo %d
 43e07244:	e28d0014 	add	r0, sp, #20
 43e07248:	e1a02004 	mov	r2, r4
-43e0724c:	eb0071af 	bl	0x43e23910
+43e0724c:	eb0071af 	bl	<sprintf>
 43e07250:	e28d0014 	add	r0, sp, #20
 43e07254:	e1a01004 	mov	r1, r4
 43e07258:	eb0015a0 	bl	<run_command>
@@ -13820,7 +13821,7 @@ Disassembly of section .data:
 43e076a4:	e59f1080 	ldr	r1, [pc, #128]	; 0x43e0772c	;; mmc %s %d 0x%lx 0x%lx 0x%lx
 43e076a8:	11a02003 	movne	r2, r3
 43e076ac:	e1a03004 	mov	r3, r4
-43e076b0:	eb007096 	bl	0x43e23910
+43e076b0:	eb007096 	bl	<sprintf>
 43e076b4:	e28d0014 	add	r0, sp, #20
 43e076b8:	e1a01004 	mov	r1, r4
 43e076bc:	eb001487 	bl	<run_command>
@@ -14471,7 +14472,7 @@ Disassembly of section .data:
 43e080d0:	e59f105c 	ldr	r1, [pc, #92]	; 0x43e08134
 43e080d4:	e28d0018 	add	r0, sp, #24
 43e080d8:	e2842004 	add	r2, r4, #4
-43e080dc:	eb006e0b 	bl	0x43e23910
+43e080dc:	eb006e0b 	bl	<sprintf>
 43e080e0:	e59f0060 	ldr	r0, [pc, #96]	; 0x43e08148	;; filesize
 43e080e4:	e28d1018 	add	r1, sp, #24
 43e080e8:	ebffff6f 	bl	0x43e07eac
@@ -14514,7 +14515,7 @@ Disassembly of section .data:
 43e0817c:	e1a02001 	mov	r2, r1
 43e08180:	e28d0004 	add	r0, sp, #4
 43e08184:	e59f1014 	ldr	r1, [pc, #20]	; 0x43e081a0
-43e08188:	eb006de0 	bl	0x43e23910
+43e08188:	eb006de0 	bl	<sprintf>
 43e0818c:	e1a00004 	mov	r0, r4
 43e08190:	e28d1004 	add	r1, sp, #4
 43e08194:	ebffff44 	bl	0x43e07eac
@@ -14640,7 +14641,7 @@ Disassembly of section .data:
 43e08374:	e3a02205 	mov	r2, #1342177280	; 0x50000000
 43e08378:	e59f10d4 	ldr	r1, [pc, #212]	; 0x43e08454	;; movi read recovery 0 0x%x
 43e0837c:	e1a0000d 	mov	r0, sp
-43e08380:	eb006d62 	bl	0x43e23910
+43e08380:	eb006d62 	bl	<sprintf>
 43e08384:	e1a0100d 	mov	r1, sp
 43e08388:	e59f00c8 	ldr	r0, [pc, #200]	; 0x43e08458
 43e0838c:	eb0004a6 	bl	<printf>
@@ -14718,7 +14719,7 @@ Disassembly of section .data:
 43e084ac:	e59f202c 	ldr	r2, [pc, #44]	; 0x43e084e0
 43e084b0:	e3a03442 	mov	r3, #1107296256	; 0x42000000
 43e084b4:	e1a0000d 	mov	r0, sp
-43e084b8:	eb006d14 	bl	0x43e23910
+43e084b8:	eb006d14 	bl	<sprintf>
 43e084bc:	e59f0020 	ldr	r0, [pc, #32]	; 0x43e084e4	;; boot recovery!
 43e084c0:	eb000459 	bl	<printf>
 43e084c4:	e1a0000d 	mov	r0, sp
@@ -22281,10 +22282,10 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0fad0:	e59f10c8 	ldr	r1, [pc, #200]	; 0x43e0fba0	;; xx%c%d
 43e0fad4:	e2822061 	add	r2, r2, #97	; 0x61
 43e0fad8:	e1a03006 	mov	r3, r6
-43e0fadc:	eb004f8b 	bl	0x43e23910
+43e0fadc:	eb004f8b 	bl	<sprintf>
 43e0fae0:	e287002c 	add	r0, r7, #44	; 0x2c
 43e0fae4:	e59f10b8 	ldr	r1, [pc, #184]	; 0x43e0fba4	;; U-Boot
-43e0fae8:	eb004f88 	bl	0x43e23910
+43e0fae8:	eb004f88 	bl	<sprintf>
 43e0faec:	e3a00000 	mov	r0, #0
 43e0faf0:	ea000022 	b	0x43e0fb80
 43e0faf4:	e35a0000 	cmp	sl, #0
@@ -24623,7 +24624,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e11f5c:	e59f10b0 	ldr	r1, [pc, #176]	; 0x43e12014	;; Man %06x Snr %08x
 43e11f60:	e1a02422 	lsr	r2, r2, #8
 43e11f64:	e183340c 	orr	r3, r3, ip, lsl #8
-43e11f68:	eb004668 	bl	0x43e23910
+43e11f68:	eb004668 	bl	<sprintf>
 43e11f6c:	e5943078 	ldr	r3, [r4, #120]	; 0x78
 43e11f70:	e5d42074 	ldrb	r2, [r4, #116]	; 0x74
 43e11f74:	e28400e9 	add	r0, r4, #233	; 0xe9
@@ -24635,14 +24636,14 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e11f8c:	e1a03c23 	lsr	r3, r3, #24
 43e11f90:	e58d1008 	str	r1, [sp, #8]
 43e11f94:	e59f107c 	ldr	r1, [pc, #124]	; 0x43e12018	;; %c%c%c%c%c
-43e11f98:	eb00465c 	bl	0x43e23910
+43e11f98:	eb00465c 	bl	<sprintf>
 43e11f9c:	e594307c 	ldr	r3, [r4, #124]	; 0x7c
 43e11fa0:	e28400fe 	add	r0, r4, #254	; 0xfe
 43e11fa4:	e28440a8 	add	r4, r4, #168	; 0xa8
 43e11fa8:	e59f106c 	ldr	r1, [pc, #108]	; 0x43e1201c	;; %d.%d
 43e11fac:	e1a02e23 	lsr	r2, r3, #28
 43e11fb0:	e7e33c53 			; <UNDEFINED> instruction: 0xe7e33c53
-43e11fb4:	eb004655 	bl	0x43e23910
+43e11fb4:	eb004655 	bl	<sprintf>
 43e11fb8:	e1a00004 	mov	r0, r4
 43e11fbc:	ebfff608 	bl	0x43e0f7e4
 43e11fc0:	e1a00004 	mov	r0, r4
@@ -25435,7 +25436,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e12c0c:	e5854018 	str	r4, [r5, #24]
 43e12c10:	e59f1134 	ldr	r1, [pc, #308]	; 0x43e12d4c
 43e12c14:	e5952000 	ldr	r2, [r5]
-43e12c18:	eb00433c 	bl	0x43e23910
+43e12c18:	eb00433c 	bl	<sprintf>
 43e12c1c:	e59f312c 	ldr	r3, [pc, #300]	; 0x43e12d50
 43e12c20:	e5843118 	str	r3, [r4, #280]	; 0x118
 43e12c24:	e59f3128 	ldr	r3, [pc, #296]	; 0x43e12d54
@@ -26142,7 +26143,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e13718:	e0243194 	mla	r4, r4, r1, r3
 43e1371c:	e59f1098 	ldr	r1, [pc, #152]	; 0x43e137bc	;; S5P_MSHC%d
 43e13720:	e2840008 	add	r0, r4, #8
-43e13724:	eb004079 	bl	0x43e23910
+43e13724:	eb004079 	bl	<sprintf>
 43e13728:	e3a03050 	mov	r3, #80	; 0x50
 43e1372c:	e0030593 	mul	r3, r3, r5
 43e13730:	e2862d23 	add	r2, r6, #2240	; 0x8c0
@@ -34985,7 +34986,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e1c144:	0a000003 	beq	0x43e1c158
 43e1c148:	e1a0000d 	mov	r0, sp
 43e1c14c:	e59f1030 	ldr	r1, [pc, #48]	; 0x43e1c184	;; %s/%s
-43e1c150:	eb001dee 	bl	0x43e23910
+43e1c150:	eb001dee 	bl	<sprintf>
 43e1c154:	e1a0000d 	mov	r0, sp
 43e1c158:	e59f301c 	ldr	r3, [pc, #28]	; 0x43e1c17c
 43e1c15c:	e3a01018 	mov	r1, #24
@@ -35020,7 +35021,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e1c1d0:	0a000003 	beq	0x43e1c1e4
 43e1c1d4:	e1a0000d 	mov	r0, sp
 43e1c1d8:	e59f1038 	ldr	r1, [pc, #56]	; 0x43e1c218	;; %s/%s
-43e1c1dc:	eb001dcb 	bl	0x43e23910
+43e1c1dc:	eb001dcb 	bl	<sprintf>
 43e1c1e0:	e1a0000d 	mov	r0, sp
 43e1c1e4:	e59f3024 	ldr	r3, [pc, #36]	; 0x43e1c210
 43e1c1e8:	e3a01018 	mov	r1, #24
@@ -41837,7 +41838,7 @@ memcmp:	e92d4010 	push	{r4, lr}
 43e22c4c:	e1a06000 	mov	r6, r0
 43e22c50:	e1a00004 	mov	r0, r4
 43e22c54:	e1a02006 	mov	r2, r6
-43e22c58:	eb00032c 	bl	0x43e23910
+43e22c58:	eb00032c 	bl	<sprintf>
 43e22c5c:	e3a01ffa 	mov	r1, #1000	; 0x3e8
 43e22c60:	e1a07000 	mov	r7, r0
 43e22c64:	e59f0028 	ldr	r0, [pc, #40]	; 0x43e22c94
@@ -41847,7 +41848,7 @@ memcmp:	e92d4010 	push	{r4, lr}
 43e22c74:	0a000002 	beq	0x43e22c84
 43e22c78:	e0840007 	add	r0, r4, r7
 43e22c7c:	e59f1014 	ldr	r1, [pc, #20]	; 0x43e22c98	;; .%03ld
-43e22c80:	eb000322 	bl	0x43e23910
+43e22c80:	eb000322 	bl	<sprintf>
 43e22c84:	e1a00004 	mov	r0, r4
 43e22c88:	e8bd80f8 	pop	{r3, r4, r5, r6, r7, pc}
 43e22c8c:	000f4240 	andeq	r4, pc, r0, asr #4
@@ -42651,7 +42652,7 @@ memcmp:	e92d4010 	push	{r4, lr}
 43e23904:	e8bd86f0 	pop	{r4, r5, r6, r7, r9, sl, pc}
 43e23908:	43e2d5b0 	mvnmi	sp, #176, 10	; 0x2c000000
 43e2390c:	eafffe39 	b	0x43e231f8
-43e23910:	e92d000e 	push	{r1, r2, r3}
+sprintf:	e92d000e 	push	{r1, r2, r3}
 43e23914:	e92d4003 	push	{r0, r1, lr}
 43e23918:	e28d2010 	add	r2, sp, #16
 43e2391c:	e59d100c 	ldr	r1, [sp, #12]
@@ -51359,18 +51360,20 @@ is_system_locked:	e92d4030 	push	{r4, r5, lr}
 43e2c12c:	43e35b6b 	mvnmi	r5, #109568	; 0x1ac00
 43e2c130:	43e35b78 	mvnmi	r5, #120, 22	; 0x1e000
 43e2c134:	ffff0000 			; <UNDEFINED> instruction: 0xffff0000
-43e2c138:	e92d4070 	push	{r4, r5, r6, lr}
+
+_check_signature:	e92d4070 	push	{r4, r5, r6, lr}
 43e2c13c:	e24dd030 	sub	sp, sp, #48	; 0x30
-43e2c140:	e1a06003 	mov	r6, r3
-43e2c144:	e1a04000 	mov	r4, r0
-43e2c148:	e59d3040 	ldr	r3, [sp, #64]	; 0x40
-43e2c14c:	e3530c01 	cmp	r3, #256	; 0x100
+43e2c140:	e1a06003 	mov	r6, r3								;; r6 = r3 = sigbase
+43e2c144:	e1a04000 	mov	r4, r0								;; r4 = r0 = sbctx
+43e2c148:	e59d3040 	ldr	r3, [sp, #64]	; 0x40				;; arg4 in stack, should be 256, sigsize
+43e2c14c:	e3530c01 	cmp	r3, #256	; 0x100					;; 
 43e2c150:	159f004c 	ldrne	r0, [pc, #76]	; 0x43e2c1a4
 43e2c154:	1a000010 	bne	0x43e2c19c
-43e2c158:	e28d5010 	add	r5, sp, #16
-43e2c15c:	e3a03001 	mov	r3, #1
-43e2c160:	e1a00005 	mov	r0, r5
-43e2c164:	ebff553c 	bl	0x43e0165c
+43e2c158:	e28d5010 	add	r5, sp, #16							;; r5 = buf_, size 32
+																;; SB23? SB20_HMAC_SHA1_LEN
+43e2c15c:	e3a03001 	mov	r3, #1								;; r3 = 1
+43e2c160:	e1a00005 	mov	r0, r5								;; r0 = buf_
+43e2c164:	ebff553c 	bl	0x43e0165c							;; dosha256(buf_, dbase, dsize, 1)
 43e2c168:	e2841004 	add	r1, r4, #4
 43e2c16c:	e3a03001 	mov	r3, #1
 43e2c170:	e1a02006 	mov	r2, r6
@@ -51379,7 +51382,7 @@ is_system_locked:	e92d4030 	push	{r4, r5, lr}
 43e2c17c:	e58d5008 	str	r5, [sp, #8]
 43e2c180:	e2844f42 	add	r4, r4, #264	; 0x108
 43e2c184:	e88d1010 	stm	sp, {r4, ip}
-43e2c188:	ebffff99 	bl	0x43e2bff4
+43e2c188:	ebffff99 	bl	0x43e2bff4							;; (64, sbctx+4, sigbase, 1, sbctx+0x108, 32, buf_)
 43e2c18c:	e59f3014 	ldr	r3, [pc, #20]	; 0x43e2c1a8
 43e2c190:	e3500000 	cmp	r0, #0
 43e2c194:	11a00003 	movne	r0, r3

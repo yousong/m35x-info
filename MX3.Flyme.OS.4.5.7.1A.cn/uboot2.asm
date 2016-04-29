@@ -7116,7 +7116,7 @@ Disassembly of section .data:
 43e00dfc:	112fff1e 	bxne	lr
 43e00e00:	eaffffe6 	b	0x43e00da0
 43e00e04:	43e35bf8 	mvnmi	r5, #248, 22	; 0x3e000
-43e00e08:	e92d4008 	push	{r3, lr}
+reset_cpu:	e92d4008 	push	{r3, lr}
 43e00e0c:	e59f0020 	ldr	r0, [pc, #32]	; 0x43e00e34	;; reset...
 43e00e10:	eb002205 	bl	<printf>
 43e00e14:	e59f301c 	ldr	r3, [pc, #28]	; 0x43e00e38
@@ -7734,7 +7734,7 @@ security_check:	e92d4010 	push	{r4, lr}
 43e01798:	e12fff1e 	bx	lr
 43e0179c:	e12fff1e 	bx	lr
 43e017a0:	e92d4008 	push	{r3, lr}
-43e017a4:	eb000325 	bl	0x43e02440
+43e017a4:	eb000325 	bl	<disable_interrupt>
 43e017a8:	eb0003e2 	bl	0x43e02738
 43e017ac:	ebffffee 	bl	0x43e0176c
 43e017b0:	eb0003ea 	bl	0x43e02760
@@ -8543,8 +8543,10 @@ security_check:	e92d4010 	push	{r4, lr}
 43e02434:	e12fff1e 	bx	lr
 43e02438:	43e00054 	mvnmi	r0, #84	; 0x54
 43e0243c:	e12fff1e 	bx	lr
-43e02440:	e3a00000 	mov	r0, #0
+
+disable_interrupt:	e3a00000 	mov	r0, #0					;; CONFIG_USE_INTERRUPT not defined
 43e02444:	e12fff1e 	bx	lr
+
 43e02448:	e92d4008 	push	{r3, lr}
 43e0244c:	e59f0000 	ldr	r0, [pc]	; 0x43e02454
 43e02450:	eb008537 	bl	0x43e23934
@@ -8685,23 +8687,25 @@ security_check:	e92d4010 	push	{r4, lr}
 43e0266c:	ebffff79 	bl	0x43e02458
 43e02670:	ebffff74 	bl	0x43e02448
 43e02674:	43e2ed48 	mvnmi	lr, #72, 26	; 0x1200
-43e02678:	e92d4008 	push	{r3, lr}
+
+do_reset:	e92d4008 	push	{r3, lr}
 43e0267c:	e59f001c 	ldr	r0, [pc, #28]	; 0x43e026a0	;; resetting ...
 43e02680:	eb001bdf 	bl	<puts>
-43e02684:	e30c0350 	tst	ip, #80, 6	; 0x40000001
-43e02688:	eb008183 	bl	0x43e22c9c
-43e0268c:	ebffff6b 	bl	0x43e02440
+43e02684:	e30c0350 	tst	ip, #80, 6	; 0x40000001		;; wrong!! movw r0,0xc350
+43e02688:	eb008183 	bl	<udelay>
+43e0268c:	ebffff6b 	bl	<disable_interrupt>
 43e02690:	e3a00000 	mov	r0, #0
-43e02694:	ebfff9db 	bl	0x43e00e08
+43e02694:	ebfff9db 	bl	<reset_cpu>
 43e02698:	e3a00000 	mov	r0, #0
 43e0269c:	e8bd8008 	pop	{r3, pc}
 43e026a0:	43e2ee47 	mvnmi	lr, #1136	; 0x470
+
 43e026a4:	e92d4008 	push	{r3, lr}
 43e026a8:	e59f001c 	ldr	r0, [pc, #28]	; 0x43e026cc	;; Start Power Off ...
 43e026ac:	eb001bd4 	bl	<puts>
 43e026b0:	e30c0350 	tst	ip, #80, 6	; 0x40000001
-43e026b4:	eb008178 	bl	0x43e22c9c
-43e026b8:	ebffff60 	bl	0x43e02440
+43e026b4:	eb008178 	bl	<udelay>
+43e026b8:	ebffff60 	bl	<disable_interrupt>
 43e026bc:	e3a00000 	mov	r0, #0
 43e026c0:	ebfff9dd 	bl	0x43e00e3c
 43e026c4:	e3a00000 	mov	r0, #0
@@ -8778,10 +8782,10 @@ security_check:	e92d4010 	push	{r4, lr}
 													;; do_bootz
 													;;	bootz_start inlined
 43e027dc:	e24ddd05 	sub	sp, sp, #320	; 0x140
-43e027e0:	e1a05002 	mov	r5, r2
-43e027e4:	e1a04003 	mov	r4, r3
-43e027e8:	e1a07001 	mov	r7, r1
-43e027ec:	e1a06000 	mov	r6, r0
+43e027e0:	e1a05002 	mov	r5, r2					;; r5 = r2 = argc
+43e027e4:	e1a04003 	mov	r4, r3					;; r4 = r3 = argv
+43e027e8:	e1a07001 	mov	r7, r1					;; r7 = r1 = flag
+43e027ec:	e1a06000 	mov	r6, r0					;; r6 = r0 = cmdtp
 43e027f0:	ebfffb76 	bl	<security_check>				;; security_check()
 43e027f4:	e3a01000 	mov	r1, #0
 43e027f8:	e3a02f4b 	mov	r2, #300	; 0x12c
@@ -8818,18 +8822,18 @@ security_check:	e92d4010 	push	{r4, lr}
 43e02874:	e28d307c 	add	r3, sp, #124	; 0x7c
 43e02878:	e1a01004 	mov	r1, r4
 43e0287c:	e58d3004 	str	r3, [sp, #4]
-43e02880:	e3a03002 	mov	r3, #2
-43e02884:	eb00239f 	bl	0x43e0b708
+43e02880:	e3a03002 	mov	r3, #2							;; IH_INITRD_ARCH, IH_ARCH_ARM
+43e02884:	eb00239f 	bl	<boot_get_ramdisk>
 43e02888:	e250a000 	subs	sl, r0, #0
 43e0288c:	0a000004 	beq	0x43e028a4
 43e02890:	e59f0048 	ldr	r0, [pc, #72]	; 0x43e028e0	;; Ramdisk image is corrupt or invalid
 43e02894:	eb001b5a 	bl	<puts>
 43e02898:	e3a00001 	mov	r0, #1
 43e0289c:	e28ddd05 	add	sp, sp, #320	; 0x140
-43e028a0:	e8bd84f0 	pop	{r4, r5, r6, r7, sl, pc}
-43e028a4:	ebfffee5 	bl	0x43e02440
-43e028a8:	eb002bd0 	bl	0x43e0d7f0
-43e028ac:	eb0001a7 	bl	0x43e02f50
+43e028a0:	e8bd84f0 	pop	{r4, r5, r6, r7, sl, pc}		;; bootz_start end
+43e028a4:	ebfffee5 	bl	<disable_interrupt>
+43e028a8:	eb002bd0 	bl	<usb_stop>
+43e028ac:	eb0001a7 	bl	<arch_preboot_os>
 43e028b0:	e1a01005 	mov	r1, r5	;; IRQs %s FIQs %s Mode %s%s
 43e028b4:	e1a02004 	mov	r2, r4
 43e028b8:	e28d3014 	add	r3, sp, #20
@@ -8839,7 +8843,7 @@ security_check:	e92d4010 	push	{r4, lr}
 43e028c8:	e1a01007 	mov	r1, r7	;; IRQs %s FIQs %s Mode %s%s
 43e028cc:	e1a02005 	mov	r2, r5	;; IRQs %s FIQs %s Mode %s%s
 43e028d0:	e1a03004 	mov	r3, r4
-43e028d4:	ebffff67 	bl	0x43e02678
+43e028d4:	ebffff67 	bl	<do_reset>
 43e028d8:	eaffffee 	b	0x43e02898
 43e028dc:	43e35d9c 	mvnmi	r5, #156, 26	; 0x2700
 43e028e0:	43e2eed5 	mvnmi	lr, #3408	; 0xd50
@@ -9226,7 +9230,7 @@ security_check:	e92d4010 	push	{r4, lr}
 43e02ed4:	e2432068 	sub	r2, r3, #104	; 0x68
 43e02ed8:	e58d3004 	str	r3, [sp, #4]
 43e02edc:	e3a03002 	mov	r3, #2
-43e02ee0:	eb002208 	bl	0x43e0b708
+43e02ee0:	eb002208 	bl	<boot_get_ramdisk>
 43e02ee4:	e3500000 	cmp	r0, #0
 43e02ee8:	159f005c 	ldrne	r0, [pc, #92]	; 0x43e02f4c	;; Ramdisk image is corrupt or invalid
 43e02eec:	1affffdb 	bne	0x43e02e60
@@ -9254,8 +9258,10 @@ security_check:	e92d4010 	push	{r4, lr}
 43e02f44:	43e2f15e 	mvnmi	pc, #-2147483625	; 0x80000017
 43e02f48:	43e36fa4 	mvnmi	r6, #164, 30	; 0x290
 43e02f4c:	43e2eed5 	mvnmi	lr, #3408	; 0xd50
-43e02f50:	e12fff1e 	bx	lr
+
+arch_preboot_os:	e12fff1e 	bx	lr
 43e02f54:	e92d44f0 	push	{r4, r5, r6, r7, sl, lr}
+
 43e02f58:	e1a04000 	mov	r4, r0
 43e02f5c:	e24dd030 	sub	sp, sp, #48	; 0x30
 43e02f60:	e1a05002 	mov	r5, r2
@@ -9376,8 +9382,8 @@ security_check:	e92d4010 	push	{r4, lr}
 43e0312c:	e59f0060 	ldr	r0, [pc, #96]	; 0x43e03194	;; prep subcommand not supported
 43e03130:	eb00193d 	bl	<printf>
 43e03134:	ea00000a 	b	0x43e03164
-43e03138:	ebfffcc0 	bl	0x43e02440
-43e0313c:	ebffff83 	bl	0x43e02f50
+43e03138:	ebfffcc0 	bl	<disable_interrupt>
+43e0313c:	ebffff83 	bl	<arch_preboot_os>
 43e03140:	e1a0000a 	mov	r0, sl
 43e03144:	e1a01005 	mov	r1, r5
 43e03148:	e1a02007 	mov	r2, r7
@@ -9434,10 +9440,10 @@ security_check:	e92d4010 	push	{r4, lr}
 43e03214:	ebfffe6c 	bl	0x43e02bcc
 43e03218:	e3500000 	cmp	r0, #0
 43e0321c:	1a000078 	bne	0x43e03404
-43e03220:	ebfffc86 	bl	0x43e02440
+43e03220:	ebfffc86 	bl	<disable_interrupt>
 43e03224:	e59f41e4 	ldr	r4, [pc, #484]	; 0x43e03410
 43e03228:	e1a0b000 	mov	fp, r0
-43e0322c:	eb00296f 	bl	0x43e0d7f0
+43e0322c:	eb00296f 	bl	<usb_stop>
 43e03230:	e5943058 	ldr	r3, [r4, #88]	; 0x58
 43e03234:	e2840048 	add	r0, r4, #72	; 0x48
 43e03238:	e58d3000 	str	r3, [sp]
@@ -9474,7 +9480,7 @@ security_check:	e92d4010 	push	{r4, lr}
 43e032b4:	e1a01009 	mov	r1, r9
 43e032b8:	e1a02006 	mov	r2, r6
 43e032bc:	e1a03005 	mov	r3, r5
-43e032c0:	ebfffcec 	bl	0x43e02678
+43e032c0:	ebfffcec 	bl	<do_reset>
 43e032c4:	ea000006 	b	0x43e032e4
 43e032c8:	e3700003 	cmn	r0, #3
 43e032cc:	1a000004 	bne	0x43e032e4
@@ -9542,7 +9548,7 @@ security_check:	e92d4010 	push	{r4, lr}
 43e033c4:	e3e00007 	mvn	r0, #7
 43e033c8:	eb002223 	bl	0x43e0bc5c
 43e033cc:	ea00000c 	b	0x43e03404
-43e033d0:	ebfffede 	bl	0x43e02f50
+43e033d0:	ebfffede 	bl	<arch_preboot_os>
 43e033d4:	e1a01006 	mov	r1, r6
 43e033d8:	e1a02005 	mov	r2, r5
 43e033dc:	e1a0300a 	mov	r3, sl
@@ -9554,7 +9560,7 @@ security_check:	e92d4010 	push	{r4, lr}
 43e033f4:	e1a01009 	mov	r1, r9
 43e033f8:	e1a02006 	mov	r2, r6
 43e033fc:	e1a03005 	mov	r3, r5
-43e03400:	ebfffc9c 	bl	0x43e02678
+43e03400:	ebfffc9c 	bl	<do_reset>
 43e03404:	e3a00001 	mov	r0, #1
 43e03408:	e28dd040 	add	sp, sp, #64	; 0x40
 43e0340c:	e8bd8ef0 	pop	{r4, r5, r6, r7, r9, sl, fp, pc}
@@ -10587,7 +10593,7 @@ security_check:	e92d4010 	push	{r4, lr}
 43e04418:	e1a01004 	mov	r1, r4
 43e0441c:	e1a02004 	mov	r2, r4
 43e04420:	e1a03004 	mov	r3, r4
-43e04424:	ebfff893 	bl	0x43e02678
+43e04424:	ebfff893 	bl	<do_reset>
 43e04428:	ea0001bb 	b	0x43e04b1c
 43e0442c:	e1a00007 	mov	r0, r7
 43e04430:	e59f1740 	ldr	r1, [pc, #1856]	; 0x43e04b78	;; getvar:
@@ -14215,11 +14221,11 @@ security_check:	e92d4010 	push	{r4, lr}
 43e07ccc:	e59f01a0 	ldr	r0, [pc, #416]	; 0x43e07e74	;; ## Switch baudrate to %d bps andpress ENTER ...
 43e07cd0:	eb000655 	bl	<printf>
 43e07cd4:	e30c0350 	tst	ip, #80, 6	; 0x40000001
-43e07cd8:	eb006bef 	bl	0x43e22c9c
+43e07cd8:	eb006bef 	bl	<udelay>
 43e07cdc:	e588a008 	str	sl, [r8, #8]
 43e07ce0:	eb00162c 	bl	0x43e0d598
 43e07ce4:	e30c0350 	tst	ip, #80, 6	; 0x40000001
-43e07ce8:	eb006beb 	bl	0x43e22c9c
+43e07ce8:	eb006beb 	bl	<udelay>
 43e07cec:	eb000628 	bl	0x43e09594
 43e07cf0:	e350000d 	cmp	r0, #13
 43e07cf4:	1afffffc 	bne	0x43e07cec
@@ -15281,7 +15287,7 @@ security_check:	e92d4010 	push	{r4, lr}
 43e08d74:	eb00664b 	bl	0x43e226a8
 43e08d78:	e3500000 	cmp	r0, #0
 43e08d7c:	1a000004 	bne	0x43e08d94
-43e08d80:	eb00129a 	bl	0x43e0d7f0
+43e08d80:	eb00129a 	bl	<usb_stop>
 43e08d84:	e59f0154 	ldr	r0, [pc, #340]	; 0x43e08ee0	;; (Re)start USB...
 43e08d88:	eb000227 	bl	<printf>
 43e08d8c:	eb0015ed 	bl	0x43e0e548
@@ -15294,7 +15300,7 @@ security_check:	e92d4010 	push	{r4, lr}
 43e08da8:	1a000003 	bne	0x43e08dbc
 43e08dac:	e59f0134 	ldr	r0, [pc, #308]	; 0x43e08ee8	;; stopping USB..
 43e08db0:	eb00021d 	bl	<printf>
-43e08db4:	eb00128d 	bl	0x43e0d7f0
+43e08db4:	eb00128d 	bl	<usb_stop>
 43e08db8:	ea000012 	b	0x43e08e08
 43e08dbc:	e59f3128 	ldr	r3, [pc, #296]	; 0x43e08eec
 43e08dc0:	e5d33000 	ldrb	r3, [r3]
@@ -17941,7 +17947,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0b6fc:	e12fff1e 	bx	lr
 43e0b700:	e3a00000 	mov	r0, #0
 43e0b704:	e12fff1e 	bx	lr
-43e0b708:	e92d4ef3 	push	{r0, r1, r4, r5, r6, r7, r9, sl, fp, lr}
+boot_get_ramdisk:	e92d4ef3 	push	{r0, r1, r4, r5, r6, r7, r9, sl, fp, lr}
 43e0b70c:	e1a0a003 	mov	sl, r3	;; %sImage Type:
 43e0b710:	e59d602c 	ldr	r6, [sp, #44]	; 0x2c
 43e0b714:	e3500002 	cmp	r0, #2
@@ -19122,7 +19128,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0c970:	ea000008 	b	0x43e0c998
 43e0c974:	e3020710 	tst	r2, #16, 14	; 0x400000
 43e0c978:	e2855001 	add	r5, r5, #1
-43e0c97c:	eb0058c6 	bl	0x43e22c9c
+43e0c97c:	eb0058c6 	bl	<udelay>
 43e0c980:	ea000000 	b	0x43e0c988
 43e0c984:	e3a05000 	mov	r5, #0
 43e0c988:	e3550064 	cmp	r5, #100	; 0x64
@@ -20047,7 +20053,8 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0d7e4:	e1520003 	cmp	r2, r3
 43e0d7e8:	c5802004 	strgt	r2, [r0, #4]
 43e0d7ec:	e8bd8010 	pop	{r4, pc}
-43e0d7f0:	e92d4008 	push	{r3, lr}
+
+usb_stop:	e92d4008 	push	{r3, lr}
 43e0d7f4:	e59f3024 	ldr	r3, [pc, #36]	; 0x43e0d820
 43e0d7f8:	e5d30000 	ldrb	r0, [r3]
 43e0d7fc:	e3500000 	cmp	r0, #0
@@ -21038,11 +21045,13 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0e760:	e28dd018 	add	sp, sp, #24
 43e0e764:	e8bd44f0 	pop	{r4, r5, r6, r7, sl, lr}
 43e0e768:	ea005157 	b	0x43e22ccc
+
 43e0e76c:	e59f3008 	ldr	r3, [pc, #8]	; 0x43e0e77c
 43e0e770:	e3a02000 	mov	r2, #0
 43e0e774:	e5832000 	str	r2, [r3]
 43e0e778:	e12fff1e 	bx	lr
 43e0e77c:	43e43b00 	mvnmi	r3, #0, 22
+
 43e0e780:	e92d4ef0 	push	{r4, r5, r6, r7, r9, sl, fp, lr}
 43e0e784:	e2815001 	add	r5, r1, #1
 43e0e788:	e24dd0a0 	sub	sp, sp, #160	; 0xa0
@@ -21380,7 +21389,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0ecb8:	e59f4038 	ldr	r4, [pc, #56]	; 0x43e0ecf8
 43e0ecbc:	ea000001 	b	0x43e0ecc8
 43e0ecc0:	e3a00014 	mov	r0, #20
-43e0ecc4:	eb004ff4 	bl	0x43e22c9c
+43e0ecc4:	eb004ff4 	bl	<udelay>
 43e0ecc8:	ebffea3a 	bl	0x43e095b8
 43e0eccc:	e3500000 	cmp	r0, #0
 43e0ecd0:	1a000001 	bne	0x43e0ecdc
@@ -21459,7 +21468,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0edf4:	ea000057 	b	0x43e0ef58
 43e0edf8:	ebffffbf 	bl	0x43e0ecfc
 43e0edfc:	e59f017c 	ldr	r0, [pc, #380]	; 0x43e0ef80
-43e0ee00:	eb004fa5 	bl	0x43e22c9c
+43e0ee00:	eb004fa5 	bl	<udelay>
 43e0ee04:	ea000052 	b	0x43e0ef54
 43e0ee08:	e5943000 	ldr	r3, [r4]
 43e0ee0c:	e59f1170 	ldr	r1, [pc, #368]	; 0x43e0ef84
@@ -21695,7 +21704,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0f1a4:	e2466001 	sub	r6, r6, #1
 43e0f1a8:	e3560000 	cmp	r6, #0
 43e0f1ac:	d5849428 	strle	r9, [r4, #1064]	; 0x428
-43e0f1b0:	eb004eb9 	bl	0x43e22c9c
+43e0f1b0:	eb004eb9 	bl	<udelay>
 43e0f1b4:	e5940428 	ldr	r0, [r4, #1064]	; 0x428
 43e0f1b8:	e3500000 	cmp	r0, #0
 43e0f1bc:	03a00015 	moveq	r0, #21
@@ -21922,7 +21931,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0f530:	aafffffc 	bge	0x43e0f528
 43e0f534:	e59f0008 	ldr	r0, [pc, #8]	; 0x43e0f544
 43e0f538:	e8bd4010 	pop	{r4, lr}
-43e0f53c:	ea004dd6 	b	0x43e22c9c
+43e0f53c:	ea004dd6 	b	<udelay>
 43e0f540:	43e43c04 	mvnmi	r3, #4, 24	; 0x400
 43e0f544:	0003d090 	muleq	r3, r0, r0
 43e0f548:	e2800008 	add	r0, r0, #8
@@ -23423,7 +23432,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e10ca4:	e2555001 	subs	r5, r5, #1
 43e10ca8:	4a000009 	bmi	0x43e10cd4
 43e10cac:	e3a00ffa 	mov	r0, #1000	; 0x3e8
-43e10cb0:	eb0047f9 	bl	0x43e22c9c
+43e10cb0:	eb0047f9 	bl	<udelay>
 43e10cb4:	e2544001 	subs	r4, r4, #1
 43e10cb8:	2affffe5 	bcs	0x43e10c54
 43e10cbc:	e3540000 	cmp	r4, #0
@@ -23803,7 +23812,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e11288:	e24dd020 	sub	sp, sp, #32
 43e1128c:	e1a04000 	mov	r4, r0
 43e11290:	e3a00ffa 	mov	r0, #1000	; 0x3e8
-43e11294:	eb004680 	bl	0x43e22c9c
+43e11294:	eb004680 	bl	<udelay>
 43e11298:	e3a02000 	mov	r2, #0
 43e1129c:	e1a00004 	mov	r0, r4
 43e112a0:	e1a0100d 	mov	r1, sp
@@ -23815,7 +23824,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e112b8:	e2504000 	subs	r4, r0, #0
 43e112bc:	1a000001 	bne	0x43e112c8
 43e112c0:	e3a00e7d 	mov	r0, #2000	; 0x7d0
-43e112c4:	eb004674 	bl	0x43e22c9c
+43e112c4:	eb004674 	bl	<udelay>
 43e112c8:	e1a00004 	mov	r0, r4
 43e112cc:	e28dd020 	add	sp, sp, #32
 43e112d0:	e8bd8010 	pop	{r4, pc}
@@ -23857,7 +23866,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e11360:	e2505000 	subs	r5, r0, #0
 43e11364:	1a000026 	bne	0x43e11404
 43e11368:	e3a00ffa 	mov	r0, #1000	; 0x3e8
-43e1136c:	eb00464a 	bl	0x43e22c9c
+43e1136c:	eb00464a 	bl	<udelay>
 43e11370:	e59d300c 	ldr	r3, [sp, #12]
 43e11374:	e3530000 	cmp	r3, #0
 43e11378:	ba000002 	blt	0x43e11388
@@ -23918,7 +23927,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e11454:	1a00003e 	bne	0x43e11554
 43e11458:	e3a00ffa 	mov	r0, #1000	; 0x3e8
 43e1145c:	e3026710 	tst	r2, #16, 14	; 0x400000
-43e11460:	eb00460d 	bl	0x43e22c9c
+43e11460:	eb00460d 	bl	<udelay>
 43e11464:	e1a0a00d 	mov	sl, sp
 43e11468:	e5941054 	ldr	r1, [r4, #84]	; 0x54
 43e1146c:	e1cd70b0 	strh	r7, [sp]
@@ -23944,7 +23953,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e114bc:	e2505000 	subs	r5, r0, #0
 43e114c0:	1a000023 	bne	0x43e11554
 43e114c4:	e3a00ffa 	mov	r0, #1000	; 0x3e8
-43e114c8:	eb0045f3 	bl	0x43e22c9c
+43e114c8:	eb0045f3 	bl	<udelay>
 43e114cc:	e59d300c 	ldr	r3, [sp, #12]
 43e114d0:	e3530000 	cmp	r3, #0
 43e114d4:	aa000002 	bge	0x43e114e4
@@ -25070,7 +25079,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e12654:	ebffdbf4 	bl	<printf>
 43e12658:	ea000008 	b	0x43e12680
 43e1265c:	e3a00ffa 	mov	r0, #1000	; 0x3e8
-43e12660:	eb00418d 	bl	0x43e22c9c
+43e12660:	eb00418d 	bl	<udelay>
 43e12664:	e5973004 	ldr	r3, [r7, #4]
 43e12668:	e1d332bc 	ldrh	r3, [r3, #44]	; 0x2c
 43e1266c:	e3130002 	tst	r3, #2
@@ -25203,7 +25212,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e12868:	e8bd4070 	pop	{r4, r5, r6, lr}
 43e1286c:	eaffdb6e 	b	<printf>
 43e12870:	e3a00ffa 	mov	r0, #1000	; 0x3e8
-43e12874:	eb004108 	bl	0x43e22c9c
+43e12874:	eb004108 	bl	<udelay>
 43e12878:	e5943004 	ldr	r3, [r4, #4]
 43e1287c:	e5d3302f 	ldrb	r3, [r3, #47]	; 0x2f
 43e12880:	e1150003 	tst	r5, r3
@@ -25230,7 +25239,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e128d4:	e3e00011 	mvn	r0, #17
 43e128d8:	e8bd86f8 	pop	{r3, r4, r5, r6, r7, r9, sl, pc}
 43e128dc:	e3a00ffa 	mov	r0, #1000	; 0x3e8
-43e128e0:	eb0040ed 	bl	0x43e22c9c
+43e128e0:	eb0040ed 	bl	<udelay>
 43e128e4:	e5943004 	ldr	r3, [r4, #4]
 43e128e8:	e5933024 	ldr	r3, [r3, #36]	; 0x24
 43e128ec:	e11a0003 	tst	sl, r3
@@ -25588,7 +25597,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e12e6c:	ebffd9ee 	bl	<printf>
 43e12e70:	ea0000e6 	b	0x43e13210
 43e12e74:	e3a00ffa 	mov	r0, #1000	; 0x3e8
-43e12e78:	eb003f87 	bl	0x43e22c9c
+43e12e78:	eb003f87 	bl	<udelay>
 43e12e7c:	e5943008 	ldr	r3, [r4, #8]
 43e12e80:	e5933048 	ldr	r3, [r3, #72]	; 0x48
 43e12e84:	e3130c02 	tst	r3, #512	; 0x200
@@ -25624,7 +25633,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e12efc:	ebffd9ca 	bl	<printf>
 43e12f00:	ea000005 	b	0x43e12f1c
 43e12f04:	e3a00ffa 	mov	r0, #1000	; 0x3e8
-43e12f08:	eb003f63 	bl	0x43e22c9c
+43e12f08:	eb003f63 	bl	<udelay>
 43e12f0c:	e5943008 	ldr	r3, [r4, #8]
 43e12f10:	e5933000 	ldr	r3, [r3]
 43e12f14:	e3130002 	tst	r3, #2
@@ -25955,7 +25964,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e13428:	0a000034 	beq	0x43e13500
 43e1342c:	e3a0000a 	mov	r0, #10
 43e13430:	e2455001 	sub	r5, r5, #1
-43e13434:	eb003e18 	bl	0x43e22c9c
+43e13434:	eb003e18 	bl	<udelay>
 43e13438:	e5943008 	ldr	r3, [r4, #8]
 43e1343c:	e5933048 	ldr	r3, [r3, #72]	; 0x48
 43e13440:	e3130c02 	tst	r3, #512	; 0x200
@@ -25973,7 +25982,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e13470:	ebffd86d 	bl	<printf>
 43e13474:	ea000005 	b	0x43e13490
 43e13478:	e3a00ffa 	mov	r0, #1000	; 0x3e8
-43e1347c:	eb003e06 	bl	0x43e22c9c
+43e1347c:	eb003e06 	bl	<udelay>
 43e13480:	e5943008 	ldr	r3, [r4, #8]
 43e13484:	e5933000 	ldr	r3, [r3]
 43e13488:	e3130001 	tst	r3, #1
@@ -25991,7 +26000,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e134b8:	ebffd85b 	bl	<printf>
 43e134bc:	ea000005 	b	0x43e134d8
 43e134c0:	e3a00ffa 	mov	r0, #1000	; 0x3e8
-43e134c4:	eb003df4 	bl	0x43e22c9c
+43e134c4:	eb003df4 	bl	<udelay>
 43e134c8:	e5943008 	ldr	r3, [r4, #8]
 43e134cc:	e5933000 	ldr	r3, [r3]
 43e134d0:	e3130002 	tst	r3, #2
@@ -26009,7 +26018,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e13500:	ebffd849 	bl	<printf>
 43e13504:	ea000005 	b	0x43e13520
 43e13508:	e3a00ffa 	mov	r0, #1000	; 0x3e8
-43e1350c:	eb003de2 	bl	0x43e22c9c
+43e1350c:	eb003de2 	bl	<udelay>
 43e13510:	e5943008 	ldr	r3, [r4, #8]
 43e13514:	e5933000 	ldr	r3, [r3]
 43e13518:	e3130004 	tst	r3, #4
@@ -26196,48 +26205,48 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e137ec:	e1a00004 	mov	r0, r4
 43e137f0:	ebfff1a6 	bl	0x43e0fe90
 43e137f4:	e3a00001 	mov	r0, #1
-43e137f8:	eb003d27 	bl	0x43e22c9c
+43e137f8:	eb003d27 	bl	<udelay>
 43e137fc:	e1a00004 	mov	r0, r4
 43e13800:	e3a01007 	mov	r1, #7
 43e13804:	e3a02000 	mov	r2, #0
 43e13808:	ebfff1a0 	bl	0x43e0fe90
 43e1380c:	e3a00001 	mov	r0, #1
-43e13810:	eb003d21 	bl	0x43e22c9c
+43e13810:	eb003d21 	bl	<udelay>
 43e13814:	e3a01001 	mov	r1, #1
 43e13818:	e1a02001 	mov	r2, r1
 43e1381c:	e1a00004 	mov	r0, r4
 43e13820:	ebfff19a 	bl	0x43e0fe90
 43e13824:	e3a00001 	mov	r0, #1
-43e13828:	eb003d1b 	bl	0x43e22c9c
+43e13828:	eb003d1b 	bl	<udelay>
 43e1382c:	e1a00004 	mov	r0, r4
 43e13830:	e3a01007 	mov	r1, #7
 43e13834:	ebfff19e 	bl	0x43e0feb4
 43e13838:	e3a00001 	mov	r0, #1
 43e1383c:	e8bd4010 	pop	{r4, lr}
-43e13840:	ea003d15 	b	0x43e22c9c
+43e13840:	ea003d15 	b	<udelay>
 43e13844:	134003c0 	cmpne	r0, #192, 6
 43e13848:	e92d4010 	push	{r4, lr}
 43e1384c:	e3a00001 	mov	r0, #1
 43e13850:	e59f4048 	ldr	r4, [pc, #72]	; 0x43e138a0
-43e13854:	eb003d10 	bl	0x43e22c9c
+43e13854:	eb003d10 	bl	<udelay>
 43e13858:	e3a01007 	mov	r1, #7
 43e1385c:	e1a00004 	mov	r0, r4
 43e13860:	ebfff193 	bl	0x43e0feb4
 43e13864:	e3a00001 	mov	r0, #1
-43e13868:	eb003d0b 	bl	0x43e22c9c
+43e13868:	eb003d0b 	bl	<udelay>
 43e1386c:	e3a01001 	mov	r1, #1
 43e13870:	e1a02001 	mov	r2, r1
 43e13874:	e1a00004 	mov	r0, r4
 43e13878:	ebfff184 	bl	0x43e0fe90
 43e1387c:	e3a00001 	mov	r0, #1
-43e13880:	eb003d05 	bl	0x43e22c9c
+43e13880:	eb003d05 	bl	<udelay>
 43e13884:	e1a00004 	mov	r0, r4
 43e13888:	e3a01007 	mov	r1, #7
 43e1388c:	e3a02000 	mov	r2, #0
 43e13890:	ebfff17e 	bl	0x43e0fe90
 43e13894:	e3a00001 	mov	r0, #1
 43e13898:	e8bd4010 	pop	{r4, lr}
-43e1389c:	ea003cfe 	b	0x43e22c9c
+43e1389c:	ea003cfe 	b	<udelay>
 43e138a0:	134003c0 	cmpne	r0, #192, 6
 43e138a4:	e92d4038 	push	{r3, r4, r5, lr}
 43e138a8:	e1a05000 	mov	r5, r0
@@ -26247,7 +26256,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e138b8:	e3a02000 	mov	r2, #0
 43e138bc:	ebfff173 	bl	0x43e0fe90
 43e138c0:	e3a00001 	mov	r0, #1
-43e138c4:	eb003cf4 	bl	0x43e22c9c
+43e138c4:	eb003cf4 	bl	<udelay>
 43e138c8:	e3150080 	tst	r5, #128	; 0x80
 43e138cc:	e59f00c8 	ldr	r0, [pc, #200]	; 0x43e1399c
 43e138d0:	e3a01007 	mov	r1, #7
@@ -26258,15 +26267,15 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e138e4:	ebfff169 	bl	0x43e0fe90
 43e138e8:	e3a00001 	mov	r0, #1
 43e138ec:	e1a05085 	lsl	r5, r5, #1
-43e138f0:	eb003ce9 	bl	0x43e22c9c
+43e138f0:	eb003ce9 	bl	<udelay>
 43e138f4:	e3a01001 	mov	r1, #1
 43e138f8:	e1a02001 	mov	r2, r1
 43e138fc:	e59f0098 	ldr	r0, [pc, #152]	; 0x43e1399c
 43e13900:	ebfff162 	bl	0x43e0fe90
 43e13904:	e3a00001 	mov	r0, #1
-43e13908:	eb003ce3 	bl	0x43e22c9c
+43e13908:	eb003ce3 	bl	<udelay>
 43e1390c:	e3a00001 	mov	r0, #1
-43e13910:	eb003ce1 	bl	0x43e22c9c
+43e13910:	eb003ce1 	bl	<udelay>
 43e13914:	e2544001 	subs	r4, r4, #1
 43e13918:	e6ef5075 			; <UNDEFINED> instruction: 0xe6ef5075
 43e1391c:	1affffe3 	bne	0x43e138b0
@@ -26275,20 +26284,20 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e13928:	e59f006c 	ldr	r0, [pc, #108]	; 0x43e1399c
 43e1392c:	ebfff157 	bl	0x43e0fe90
 43e13930:	e3a00001 	mov	r0, #1
-43e13934:	eb003cd8 	bl	0x43e22c9c
+43e13934:	eb003cd8 	bl	<udelay>
 43e13938:	e3a01007 	mov	r1, #7
 43e1393c:	e59f0058 	ldr	r0, [pc, #88]	; 0x43e1399c
 43e13940:	ebfff15b 	bl	0x43e0feb4
 43e13944:	e3a00001 	mov	r0, #1
-43e13948:	eb003cd3 	bl	0x43e22c9c
+43e13948:	eb003cd3 	bl	<udelay>
 43e1394c:	e3a01001 	mov	r1, #1
 43e13950:	e1a02001 	mov	r2, r1
 43e13954:	e59f0040 	ldr	r0, [pc, #64]	; 0x43e1399c
 43e13958:	ebfff14c 	bl	0x43e0fe90
 43e1395c:	e3a00001 	mov	r0, #1
-43e13960:	eb003ccd 	bl	0x43e22c9c
+43e13960:	eb003ccd 	bl	<udelay>
 43e13964:	e3a00001 	mov	r0, #1
-43e13968:	eb003ccb 	bl	0x43e22c9c
+43e13968:	eb003ccb 	bl	<udelay>
 43e1396c:	e3a01007 	mov	r1, #7
 43e13970:	e59f0024 	ldr	r0, [pc, #36]	; 0x43e1399c
 43e13974:	ebfff158 	bl	0x43e0fedc
@@ -26298,7 +26307,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e13984:	e59f0010 	ldr	r0, [pc, #16]	; 0x43e1399c
 43e13988:	ebfff140 	bl	0x43e0fe90
 43e1398c:	e3a00001 	mov	r0, #1
-43e13990:	eb003cc1 	bl	0x43e22c9c
+43e13990:	eb003cc1 	bl	<udelay>
 43e13994:	e1a00005 	mov	r0, r5
 43e13998:	e8bd8038 	pop	{r3, r4, r5, pc}
 43e1399c:	134003c0 	cmpne	r0, #192, 6
@@ -26320,17 +26329,17 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e139dc:	e59f01c8 	ldr	r0, [pc, #456]	; 0x43e13bac
 43e139e0:	ebfff12a 	bl	0x43e0fe90
 43e139e4:	e3a00001 	mov	r0, #1
-43e139e8:	eb003cab 	bl	0x43e22c9c
+43e139e8:	eb003cab 	bl	<udelay>
 43e139ec:	e3a00001 	mov	r0, #1
-43e139f0:	eb003ca9 	bl	0x43e22c9c
+43e139f0:	eb003ca9 	bl	<udelay>
 43e139f4:	e3a01001 	mov	r1, #1
 43e139f8:	e1a02001 	mov	r2, r1
 43e139fc:	e59f01a8 	ldr	r0, [pc, #424]	; 0x43e13bac
 43e13a00:	ebfff122 	bl	0x43e0fe90
 43e13a04:	e3a00001 	mov	r0, #1
-43e13a08:	eb003ca3 	bl	0x43e22c9c
+43e13a08:	eb003ca3 	bl	<udelay>
 43e13a0c:	e3a00001 	mov	r0, #1
-43e13a10:	eb003ca1 	bl	0x43e22c9c
+43e13a10:	eb003ca1 	bl	<udelay>
 43e13a14:	e2544001 	subs	r4, r4, #1
 43e13a18:	1affffed 	bne	0x43e139d4
 43e13a1c:	ebffff6e 	bl	0x43e137dc
@@ -26373,19 +26382,19 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e13ab0:	e59f00f4 	ldr	r0, [pc, #244]	; 0x43e13bac
 43e13ab4:	ebfff0f5 	bl	0x43e0fe90
 43e13ab8:	e3a00001 	mov	r0, #1
-43e13abc:	eb003c76 	bl	0x43e22c9c
+43e13abc:	eb003c76 	bl	<udelay>
 43e13ac0:	e3a01001 	mov	r1, #1
 43e13ac4:	e1a02001 	mov	r2, r1
 43e13ac8:	e59f00dc 	ldr	r0, [pc, #220]	; 0x43e13bac
 43e13acc:	ebfff0ef 	bl	0x43e0fe90
 43e13ad0:	e3a00001 	mov	r0, #1
-43e13ad4:	eb003c70 	bl	0x43e22c9c
+43e13ad4:	eb003c70 	bl	<udelay>
 43e13ad8:	e3a01007 	mov	r1, #7
 43e13adc:	e59f00c8 	ldr	r0, [pc, #200]	; 0x43e13bac
 43e13ae0:	ebfff0fd 	bl	0x43e0fedc
 43e13ae4:	e1806086 	orr	r6, r0, r6, lsl #1
 43e13ae8:	e3a00001 	mov	r0, #1
-43e13aec:	eb003c6a 	bl	0x43e22c9c
+43e13aec:	eb003c6a 	bl	<udelay>
 43e13af0:	e2544001 	subs	r4, r4, #1
 43e13af4:	1affffeb 	bne	0x43e13aa8
 43e13af8:	e3a01001 	mov	r1, #1
@@ -26394,7 +26403,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e13b04:	e2455001 	sub	r5, r5, #1
 43e13b08:	ebfff0e0 	bl	0x43e0fe90
 43e13b0c:	e3a00001 	mov	r0, #1
-43e13b10:	eb003c61 	bl	0x43e22c9c
+43e13b10:	eb003c61 	bl	<udelay>
 43e13b14:	e3550000 	cmp	r5, #0
 43e13b18:	e59f008c 	ldr	r0, [pc, #140]	; 0x43e13bac
 43e13b1c:	e3a01007 	mov	r1, #7
@@ -26404,21 +26413,21 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e13b2c:	e1a02004 	mov	r2, r4
 43e13b30:	ebfff0d6 	bl	0x43e0fe90
 43e13b34:	e3a00001 	mov	r0, #1
-43e13b38:	eb003c57 	bl	0x43e22c9c
+43e13b38:	eb003c57 	bl	<udelay>
 43e13b3c:	e3a01001 	mov	r1, #1
 43e13b40:	e1a02001 	mov	r2, r1
 43e13b44:	e59f0060 	ldr	r0, [pc, #96]	; 0x43e13bac
 43e13b48:	ebfff0d0 	bl	0x43e0fe90
 43e13b4c:	e3a00001 	mov	r0, #1
-43e13b50:	eb003c51 	bl	0x43e22c9c
+43e13b50:	eb003c51 	bl	<udelay>
 43e13b54:	e3a00001 	mov	r0, #1
-43e13b58:	eb003c4f 	bl	0x43e22c9c
+43e13b58:	eb003c4f 	bl	<udelay>
 43e13b5c:	e59f0048 	ldr	r0, [pc, #72]	; 0x43e13bac
 43e13b60:	e3a01001 	mov	r1, #1
 43e13b64:	e3a02000 	mov	r2, #0
 43e13b68:	ebfff0c8 	bl	0x43e0fe90
 43e13b6c:	e3a00001 	mov	r0, #1
-43e13b70:	eb003c49 	bl	0x43e22c9c
+43e13b70:	eb003c49 	bl	<udelay>
 43e13b74:	e3550000 	cmp	r5, #0
 43e13b78:	e4c76001 	strb	r6, [r7], #1
 43e13b7c:	1affffc4 	bne	0x43e13a94
@@ -26665,7 +26674,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e13f40:	e6ef3073 			; <UNDEFINED> instruction: 0xe6ef3073
 43e13f44:	e3530000 	cmp	r3, #0
 43e13f48:	0a000004 	beq	0x43e13f60
-43e13f4c:	eb003b52 	bl	0x43e22c9c
+43e13f4c:	eb003b52 	bl	<udelay>
 43e13f50:	e2544001 	subs	r4, r4, #1
 43e13f54:	1afffff5 	bne	0x43e13f30
 43e13f58:	e1a00004 	mov	r0, r4
@@ -27744,7 +27753,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e1501c:	e300340a 	tst	r0, #167772160	; 0xa000000
 43e15020:	e5873714 	str	r3, [r7, #1812]	; 0x714
 43e15024:	e3a00001 	mov	r0, #1
-43e15028:	eb00371b 	bl	0x43e22c9c
+43e15028:	eb00371b 	bl	<udelay>
 43e1502c:	e5973714 	ldr	r3, [r7, #1812]	; 0x714
 43e15030:	e7e73453 			; <UNDEFINED> instruction: 0xe7e73453
 43e15034:	e2033004 	and	r3, r3, #4
@@ -27752,7 +27761,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e1503c:	e3530000 	cmp	r3, #0
 43e15040:	1afffff7 	bne	0x43e15024
 43e15044:	e3a00001 	mov	r0, #1
-43e15048:	eb003713 	bl	0x43e22c9c
+43e15048:	eb003713 	bl	<udelay>
 43e1504c:	e597370c 	ldr	r3, [r7, #1804]	; 0x70c
 43e15050:	e7e73853 			; <UNDEFINED> instruction: 0xe7e73853
 43e15054:	e2033002 	and	r3, r3, #2
@@ -28587,7 +28596,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e15d48:	e59f0018 	ldr	r0, [pc, #24]	; 0x43e15d68	;; Insert a USB cable into the connector!
 43e15d4c:	ebffce36 	bl	<printf>
 43e15d50:	e3a0000a 	mov	r0, #10
-43e15d54:	eb0033d0 	bl	0x43e22c9c
+43e15d54:	eb0033d0 	bl	<udelay>
 43e15d58:	e3a03000 	mov	r3, #0
 43e15d5c:	eaffffe9 	b	0x43e15d08
 43e15d60:	1200c000 	andne	ip, r0, #0
@@ -28692,7 +28701,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e15eec:	e7deab95 			; <UNDEFINED> instruction: 0xe7deab95
 43e15ef0:	e3a0000a 	mov	r0, #10
 43e15ef4:	e587a010 	str	sl, [r7, #16]
-43e15ef8:	eb003367 	bl	0x43e22c9c
+43e15ef8:	eb003367 	bl	<udelay>
 43e15efc:	e7c1a095 			; <UNDEFINED> instruction: 0xe7c1a095
 43e15f00:	e587a010 	str	sl, [r7, #16]
 43e15f04:	e5943200 	ldr	r3, [r4, #512]	; 0x200
@@ -28728,7 +28737,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e15f7c:	e5843704 	str	r3, [r4, #1796]	; 0x704
 43e15f80:	e3a0000a 	mov	r0, #10
 43e15f84:	e59f71a0 	ldr	r7, [pc, #416]	; 0x43e1612c
-43e15f88:	eb003343 	bl	0x43e22c9c
+43e15f88:	eb003343 	bl	<udelay>
 43e15f8c:	e5954704 	ldr	r4, [r5, #1796]	; 0x704
 43e15f90:	e7e74c54 			; <UNDEFINED> instruction: 0xe7e74c54
 43e15f94:	e2044040 	and	r4, r4, #64	; 0x40
@@ -28736,7 +28745,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e15f9c:	e3540000 	cmp	r4, #0
 43e15fa0:	1afffff6 	bne	0x43e15f80
 43e15fa4:	e3a0000a 	mov	r0, #10
-43e15fa8:	eb00333b 	bl	0x43e22c9c
+43e15fa8:	eb00333b 	bl	<udelay>
 43e15fac:	e3a03008 	mov	r3, #8
 43e15fb0:	e5873100 	str	r3, [r7, #256]	; 0x100
 43e15fb4:	e3a03c03 	mov	r3, #768	; 0x300
@@ -29134,7 +29143,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e165d4:	e5995004 	ldr	r5, [r9, #4]
 43e165d8:	e3a00005 	mov	r0, #5
 43e165dc:	e98d0006 	stmib	sp, {r1, r2}
-43e165e0:	eb0031ad 	bl	0x43e22c9c
+43e165e0:	eb0031ad 	bl	<udelay>
 43e165e4:	e3750001 	cmn	r5, #1
 43e165e8:	e99d0006 	ldmib	sp, {r1, r2}
 43e165ec:	0a000003 	beq	0x43e16600
@@ -29182,7 +29191,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e16694:	e5863000 	str	r3, [r6]
 43e16698:	e596a004 	ldr	sl, [r6, #4]
 43e1669c:	e3a00005 	mov	r0, #5
-43e166a0:	eb00317d 	bl	0x43e22c9c
+43e166a0:	eb00317d 	bl	<udelay>
 43e166a4:	e37a0001 	cmn	sl, #1
 43e166a8:	0a000003 	beq	0x43e166bc
 43e166ac:	e21aa902 	ands	sl, sl, #32768	; 0x8000
@@ -29459,7 +29468,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e16ae8:	e5863004 	str	r3, [r6, #4]
 43e16aec:	e5969004 	ldr	r9, [r6, #4]
 43e16af0:	e3a00005 	mov	r0, #5
-43e16af4:	eb003068 	bl	0x43e22c9c
+43e16af4:	eb003068 	bl	<udelay>
 43e16af8:	e3790001 	cmn	r9, #1
 43e16afc:	0a000003 	beq	0x43e16b10
 43e16b00:	e3190c01 	tst	r9, #256	; 0x100
@@ -29592,7 +29601,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e16cfc:	e5853000 	str	r3, [r5]
 43e16d00:	e5956000 	ldr	r6, [r5]
 43e16d04:	e3a00005 	mov	r0, #5
-43e16d08:	eb002fe3 	bl	0x43e22c9c
+43e16d08:	eb002fe3 	bl	<udelay>
 43e16d0c:	e3760001 	cmn	r6, #1
 43e16d10:	0a000003 	beq	0x43e16d24
 43e16d14:	e2161002 	ands	r1, r6, #2
@@ -29733,12 +29742,12 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e16f30:	e3833805 	orr	r3, r3, #327680	; 0x50000
 43e16f34:	e3833006 	orr	r3, r3, #6
 43e16f38:	e5843000 	str	r3, [r4]
-43e16f3c:	eb002f56 	bl	0x43e22c9c
+43e16f3c:	eb002f56 	bl	<udelay>
 43e16f40:	e5943000 	ldr	r3, [r4]
 43e16f44:	e3a00014 	mov	r0, #20
 43e16f48:	e3c33006 	bic	r3, r3, #6
 43e16f4c:	e5843000 	str	r3, [r4]
-43e16f50:	eb002f51 	bl	0x43e22c9c
+43e16f50:	eb002f51 	bl	<udelay>
 43e16f54:	e5943030 	ldr	r3, [r4, #48]	; 0x30
 43e16f58:	e383330f 	orr	r3, r3, #1006632960	; 0x3c000000
 43e16f5c:	e5843030 	str	r3, [r4, #48]	; 0x30
@@ -29768,6 +29777,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e16fbc:	12110000 	andsne	r0, r1, #0
 43e16fc0:	43f4494c 	mvnsmi	r4, #76, 18	; 0x130000
 43e16fc4:	43f44940 	mvnsmi	r4, #64, 18	; 0x100000
+
 43e16fc8:	e92d4008 	push	{r3, lr}
 43e16fcc:	e59f3040 	ldr	r3, [pc, #64]	; 0x43e17014
 43e16fd0:	e5933000 	ldr	r3, [r3]
@@ -29790,6 +29800,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e17014:	43e35bf8 	mvnmi	r5, #248, 22	; 0x3e000
 43e17018:	125b0000 	subsne	r0, fp, #0
 43e1701c:	12130000 	andsne	r0, r3, #0
+
 43e17020:	e92d4008 	push	{r3, lr}
 43e17024:	e2800008 	add	r0, r0, #8
 43e17028:	ebffcba7 	bl	0x43e09ecc
@@ -41855,7 +41866,8 @@ memcmp:	e92d4010 	push	{r4, lr}
 43e22c90:	43e35588 	mvnmi	r5, #136, 10	; 0x22000000
 43e22c94:	fff0bdc0 			; <UNDEFINED> instruction: 0xfff0bdc0
 43e22c98:	43e356bc 	mvnmi	r5, #188, 12	; 0xbc00000
-43e22c9c:	e92d4070 	push	{r4, r5, r6, lr}
+
+udelay:	e92d4070 	push	{r4, r5, r6, lr}
 43e22ca0:	e1a04000 	mov	r4, r0
 43e22ca4:	e59f601c 	ldr	r6, [pc, #28]	; 0x43e22cc8
 43e22ca8:	e1540006 	cmp	r4, r6
@@ -41867,12 +41879,13 @@ memcmp:	e92d4010 	push	{r4, lr}
 43e22cc0:	1afffff8 	bne	0x43e22ca8
 43e22cc4:	e8bd8070 	pop	{r4, r5, r6, pc}
 43e22cc8:	00989680 	addseq	r9, r8, r0, lsl #13
+
 43e22ccc:	e92d4010 	push	{r4, lr}
 43e22cd0:	e1a04000 	mov	r4, r0
 43e22cd4:	ea000002 	b	0x43e22ce4
 43e22cd8:	e3a00ffa 	mov	r0, #1000	; 0x3e8
 43e22cdc:	e2444001 	sub	r4, r4, #1
-43e22ce0:	ebffffed 	bl	0x43e22c9c
+43e22ce0:	ebffffed 	bl	<udelay>
 43e22ce4:	e3540000 	cmp	r4, #0
 43e22ce8:	1afffffa 	bne	0x43e22cd8
 43e22cec:	e8bd8010 	pop	{r4, pc}
@@ -42670,12 +42683,12 @@ sprintf:	e92d000e 	push	{r1, r2, r3}
 43e2394c:	e3a0000a 	mov	r0, #10
 43e23950:	ebff9721 	bl	0x43e095dc
 43e23954:	e59f0018 	ldr	r0, [pc, #24]	; 0x43e23974
-43e23958:	ebfffccf 	bl	0x43e22c9c
+43e23958:	ebfffccf 	bl	<udelay>
 43e2395c:	e3a00000 	mov	r0, #0
 43e23960:	e1a01000 	mov	r1, r0
 43e23964:	e1a02000 	mov	r2, r0
 43e23968:	e1a03000 	mov	r3, r0
-43e2396c:	ebff7b41 	bl	0x43e02678
+43e2396c:	ebff7b41 	bl	<do_reset>
 43e23970:	eafffffe 	b	0x43e23970
 43e23974:	000186a0 	andeq	r8, r1, r0, lsr #13
 43e23978:	e92d4007 	push	{r0, r1, r2, lr}
@@ -46716,7 +46729,7 @@ sprintf:	e92d000e 	push	{r1, r2, r3}
 43e27880:	e59f005c 	ldr	r0, [pc, #92]	; 0x43e278e4
 43e27884:	ebffa18a 	bl	0x43e0feb4
 43e27888:	e3a00064 	mov	r0, #100	; 0x64
-43e2788c:	ebffed02 	bl	0x43e22c9c
+43e2788c:	ebffed02 	bl	<udelay>
 43e27890:	e3a01004 	mov	r1, #4
 43e27894:	e3a00305 	mov	r0, #335544320	; 0x14000000
 43e27898:	ebffa18f 	bl	0x43e0fedc

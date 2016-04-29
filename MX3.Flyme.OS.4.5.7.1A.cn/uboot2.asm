@@ -8349,7 +8349,7 @@ security_check:	e92d4010 	push	{r4, lr}
 43e02134:	e5904060 	ldr	r4, [r0, #96]	; 0x60
 43e02138:	e59f0050 	ldr	r0, [pc, #80]	; 0x43e02190	;; machid
 43e0213c:	e58d3004 	str	r3, [sp, #4]
-43e02140:	eb00185e 	bl	0x43e082c0
+43e02140:	eb00185e 	bl	<getenv>
 43e02144:	e3500000 	cmp	r0, #0
 43e02148:	0a000005 	beq	0x43e02164
 43e0214c:	e3a01010 	mov	r1, #16
@@ -8382,37 +8382,38 @@ security_check:	e92d4010 	push	{r4, lr}
 43e021b8:	e0612002 	rsb	r2, r1, r2
 43e021bc:	ea008016 	b	0x43e2221c
 
-43e021c0:	e92d4038 	push	{r3, r4, r5, lr}
+setup_bootinfo_tag:	e92d4038 	push	{r3, r4, r5, lr}
 43e021c4:	e59f4038 	ldr	r4, [pc, #56]	; 0x43e02204, file offset: 0x3eb14
-43e021c8:	e59f3038 	ldr	r3, [pc, #56]	; 0x43e02208, 0x5441000a
+43e021c8:	e59f3038 	ldr	r3, [pc, #56]	; 0x43e02208, 0x5441000a, ATAG_BOOTINFO
 43e021cc:	e5945000 	ldr	r5, [r4]
-43e021d0:	e5853004 	str	r3, [r5, #4]
+43e021d0:	e5853004 	str	r3, [r5, #4]	;; params->hdr.tag = ATAG_BOOTINFO
 43e021d4:	e3a03058 	mov	r3, #88	; 0x58
-43e021d8:	e4853008 	str	r3, [r5], #8
+43e021d8:	e4853008 	str	r3, [r5], #8	;; params->hdr.size = 0x58
 43e021dc:	eb00958d 	bl	0x43e27818
-43e021e0:	e3a02f56 	mov	r2, #344	; 0x158
-43e021e4:	e1a01000 	mov	r1, r0
-43e021e8:	e1a00005 	mov	r0, r5
-43e021ec:	eb00821d 	bl	<memcpy>
+43e021e0:	e3a02f56 	mov	r2, #344		; 0x158, 85 * 4 + 4 + 344, sizeof(struct bootinfo)
+43e021e4:	e1a01000 	mov	r1, r0			;; r0 = struct bootinfo *
+43e021e8:	e1a00005 	mov	r0, r5			;; &bootinfo
+43e021ec:	eb00821d 	bl	<memcpy>		;; memcpy(&bootinfo, cryp, 0x158)
 43e021f0:	e5943000 	ldr	r3, [r4]
 43e021f4:	e5932000 	ldr	r2, [r3]
 43e021f8:	e0833102 	add	r3, r3, r2, lsl #2
 43e021fc:	e5843000 	str	r3, [r4]
 43e02200:	e8bd8038 	pop	{r3, r4, r5, pc}
-43e02204:	43e36f14 	mvnmi	r6, #20, 30	; 0x50
+43e02204:	43e36f14 	mvnmi	r6, #20, 30	; 0x50			;; static struct tag *params
 43e02208:	5441000a 	strbpl	r0, [r1], #-10
 
-43e0220c:	e92d40f8 	push	{r3, r4, r5, r6, r7, lr}
-43e02210:	e1a05000 	mov	r5, r0
+boot_prep_linux:	e92d40f8 	push	{r3, r4, r5, r6, r7, lr}
+43e02210:	e1a05000 	mov	r5, r0							;; r5 = r0 = boot_headers_t *images
 43e02214:	e59f0154 	ldr	r0, [pc, #340]	; 0x43e02370	;; bootargs
-43e02218:	eb001828 	bl	0x43e082c0
-43e0221c:	e59fe150 	ldr	lr, [pc, #336]	; 0x43e02374
-43e02220:	e5983000 	ldr	r3, [r8]
+43e02218:	eb001828 	bl	<getenv>						;; char *commanline = getenv("bootargs")
+															;; setup_start_tag()
+43e0221c:	e59fe150 	ldr	lr, [pc, #336]	; 0x43e02374	;; ATAG_CORE
+43e02220:	e5983000 	ldr	r3, [r8]						;; r8 magic, r3 = bd_t *bd
 43e02224:	e3500000 	cmp	r0, #0
-43e02228:	e5934008 	ldr	r4, [r3, #8]
+43e02228:	e5934008 	ldr	r4, [r3, #8]					;; r4 = (struct tag *)&bd->bi_boot_params
 43e0222c:	e3a03005 	mov	r3, #5
 43e02230:	e2841014 	add	r1, r4, #20
-43e02234:	e8844008 	stm	r4, {r3, lr}
+43e02234:	e8844008 	stm	r4, {r3, lr}					;; set tag id and size
 43e02238:	e3a03000 	mov	r3, #0
 43e0223c:	e5843008 	str	r3, [r4, #8]
 43e02240:	e584300c 	str	r3, [r4, #12]
@@ -8420,7 +8421,8 @@ security_check:	e92d4010 	push	{r4, lr}
 43e02248:	e59f3128 	ldr	r3, [pc, #296]	; 0x43e02378
 43e0224c:	e5831000 	str	r1, [r3]
 43e02250:	e5983000 	ldr	r3, [r8]
-43e02254:	0a000015 	beq	0x43e022b0
+															;; setup_commandline_tag()
+43e02254:	0a000015 	beq	0x43e022b0						;; if (commandline == NULL)
 43e02258:	e1a06000 	mov	r6, r0	;; bootargs
 43e0225c:	e4d03001 	ldrb	r3, [r0], #1
 43e02260:	e3530020 	cmp	r3, #32
@@ -8443,10 +8445,11 @@ security_check:	e92d4010 	push	{r4, lr}
 43e022a4:	e5932000 	ldr	r2, [r3]
 43e022a8:	e0833102 	add	r3, r3, r2, lsl #2
 43e022ac:	e5843000 	str	r3, [r4]
+
 43e022b0:	e59f40c0 	ldr	r4, [pc, #192]	; 0x43e02378
 43e022b4:	e59f60c4 	ldr	r6, [pc, #196]	; 0x43e02380
 43e022b8:	e1a00004 	mov	r0, r4
-43e022bc:	ebffffbf 	bl	0x43e021c0
+43e022bc:	ebffffbf 	bl	<setup_bootinfo_tag>
 43e022c0:	e5943000 	ldr	r3, [r4]
 43e022c4:	e3a02000 	mov	r2, #0
 43e022c8:	e3a04004 	mov	r4, #4
@@ -8493,31 +8496,33 @@ security_check:	e92d4010 	push	{r4, lr}
 43e0236c:	e8bd80f8 	pop	{r3, r4, r5, r6, r7, pc}
 43e02370:	43e2ebc1 	mvnmi	lr, #197632	; 0x30400
 43e02374:	54410001 	strbpl	r0, [r1], #-1
-43e02378:	43e36f14 	mvnmi	r6, #20, 30	; 0x50
+43e02378:	43e36f14 	mvnmi	r6, #20, 30	; 0x50		;; static struct tag *params = 0x43e36f14
 43e0237c:	54410009 	strbpl	r0, [r1], #-9
 43e02380:	54410002 	strbpl	r0, [r1], #-2
 43e02384:	54420005 	strbpl	r0, [r2], #-5
-43e02388:	e92d4070 	push	{r4, r5, r6, lr}
+
+do_bootm_linux:	e92d4070 	push	{r4, r5, r6, lr}
 43e0238c:	e2105030 	ands	r5, r0, #48	; 0x30
-43e02390:	e1a02000 	mov	r2, r0
-43e02394:	e1a04003 	mov	r4, r3
+43e02390:	e1a02000 	mov	r2, r0			;; r2 = r0 = flag
+43e02394:	e1a04003 	mov	r4, r3			;; r4 = r3 = bootm_headers_t *images
 43e02398:	13e05000 	mvnne	r5, #0
-43e0239c:	1a00000c 	bne	0x43e023d4
-43e023a0:	e2126040 	ands	r6, r2, #64	; 0x40
+43e0239c:	1a00000c 	bne	0x43e023d4		;; flag & BOOTM_STATE_OS_BD_T || flag & BOOTM_STATE_OS_CMDLINE
+43e023a0:	e2126040 	ands	r6, r2, #64	; 0x40	;; flag & BOOTM_STATE_OS_PREP
 43e023a4:	e1a00003 	mov	r0, r3
 43e023a8:	0a000001 	beq	0x43e023b4
-43e023ac:	ebffff96 	bl	0x43e0220c
+43e023ac:	ebffff96 	bl	<boot_prep_linux>
 43e023b0:	ea000007 	b	0x43e023d4
 43e023b4:	e2125080 	ands	r5, r2, #128	; 0x80
 43e023b8:	0a000002 	beq	0x43e023c8
 43e023bc:	ebffff59 	bl	0x43e02128
 43e023c0:	e1a05006 	mov	r5, r6
 43e023c4:	ea000002 	b	0x43e023d4
-43e023c8:	ebffff8f 	bl	0x43e0220c
+43e023c8:	ebffff8f 	bl	<boot_prep_linux>
 43e023cc:	e1a00004 	mov	r0, r4
 43e023d0:	ebffff54 	bl	0x43e02128
 43e023d4:	e1a00005 	mov	r0, r5
 43e023d8:	e8bd8070 	pop	{r4, r5, r6, pc}
+
 43e023dc:	e92d4008 	push	{r3, lr}
 43e023e0:	e590c024 	ldr	ip, [r0, #36]	; 0x24
 43e023e4:	e59f302c 	ldr	r3, [pc, #44]	; 0x43e02418
@@ -8771,7 +8776,7 @@ do_reset:	e92d4008 	push	{r3, lr}
 43e027b4:	e92d4010 	push	{r4, lr}
 43e027b8:	e1a04001 	mov	r4, r1	;; IRQs %s FIQs %s Mode %s%s
 43e027bc:	e59f0010 	ldr	r0, [pc, #16]	; 0x43e027d4	;; bootcmd
-43e027c0:	eb0016be 	bl	0x43e082c0
+43e027c0:	eb0016be 	bl	<getenv>
 43e027c4:	e1a01004 	mov	r1, r4	;; IRQs %s FIQs %s Mode %s%s
 43e027c8:	eb002844 	bl	<run_command>
 43e027cc:	e1a00fa0 	lsr	r0, r0, #31
@@ -8834,11 +8839,11 @@ do_reset:	e92d4008 	push	{r3, lr}
 43e028a4:	ebfffee5 	bl	<disable_interrupt>
 43e028a8:	eb002bd0 	bl	<usb_stop>
 43e028ac:	eb0001a7 	bl	<arch_preboot_os>
-43e028b0:	e1a01005 	mov	r1, r5	;; IRQs %s FIQs %s Mode %s%s
-43e028b4:	e1a02004 	mov	r2, r4
-43e028b8:	e28d3014 	add	r3, sp, #20
-43e028bc:	e1a0000a 	mov	r0, sl
-43e028c0:	ebfffeb0 	bl	0x43e02388
+43e028b0:	e1a01005 	mov	r1, r5	;; IRQs %s FIQs %s Mode %s%s	;; r1 = r5 = argc
+43e028b4:	e1a02004 	mov	r2, r4							;; r2 = r4 = argv
+43e028b8:	e28d3014 	add	r3, sp, #20						;; r3 = buf, bootm_headers_t images
+43e028bc:	e1a0000a 	mov	r0, sl							;; r0 = sl = 0, see subs sl, r0, #0
+43e028c0:	ebfffeb0 	bl	<do_bootm_linux>
 43e028c4:	e1a00006 	mov	r0, r6	;; bootcmd
 43e028c8:	e1a01007 	mov	r1, r7	;; IRQs %s FIQs %s Mode %s%s
 43e028cc:	e1a02005 	mov	r2, r5	;; IRQs %s FIQs %s Mode %s%s
@@ -8921,7 +8926,7 @@ do_reset:	e92d4008 	push	{r3, lr}
 43e02a00:	1afffff0 	bne	0x43e029c8
 43e02a04:	ea000004 	b	0x43e02a1c
 43e02a08:	e59f0044 	ldr	r0, [pc, #68]	; 0x43e02a54	;; bootargs
-43e02a0c:	eb00162b 	bl	0x43e082c0
+43e02a0c:	eb00162b 	bl	<getenv>
 43e02a10:	e59fa040 	ldr	sl, [pc, #64]	; 0x43e02a58
 43e02a14:	e3500000 	cmp	r0, #0
 43e02a18:	11a0a000 	movne	sl, r0
@@ -9503,7 +9508,7 @@ arch_preboot_os:	e12fff1e 	bx	lr
 43e03310:	0a000000 	beq	0x43e03318
 43e03314:	ebfffc48 	bl	0x43e0243c
 43e03318:	e59f00fc 	ldr	r0, [pc, #252]	; 0x43e0341c	;; autostart
-43e0331c:	eb0013e7 	bl	0x43e082c0
+43e0331c:	eb0013e7 	bl	<getenv>
 43e03320:	e3500000 	cmp	r0, #0
 43e03324:	0a00000d 	beq	0x43e03360
 43e03328:	e59f10f0 	ldr	r1, [pc, #240]	; 0x43e03420
@@ -9577,7 +9582,7 @@ arch_preboot_os:	e12fff1e 	bx	lr
 43e03438:	e1a05000 	mov	r5, r0
 43e0343c:	e59f0054 	ldr	r0, [pc, #84]	; 0x43e03498	;; autostart
 43e03440:	e1a06001 	mov	r6, r1
-43e03444:	eb00139d 	bl	0x43e082c0
+43e03444:	eb00139d 	bl	<getenv>
 43e03448:	e2503000 	subs	r3, r0, #0
 43e0344c:	01a00003 	moveq	r0, r3
 43e03450:	0a00000f 	beq	0x43e03494
@@ -9620,7 +9625,7 @@ arch_preboot_os:	e12fff1e 	bx	lr
 43e034e4:	43e0352c 	mvnmi	r3, #44, 10	; 0xb000000
 43e034e8:	43e03548 	mvnmi	r3, #72, 10	; 0x12000000
 43e034ec:	e59f0280 	ldr	r0, [pc, #640]	; 0x43e03774	;; loadaddr
-43e034f0:	eb001372 	bl	0x43e082c0
+43e034f0:	eb001372 	bl	<getenv>
 43e034f4:	e3500000 	cmp	r0, #0
 43e034f8:	059fb278 	ldreq	fp, [pc, #632]	; 0x43e03778
 43e034fc:	1a000001 	bne	0x43e03508
@@ -9631,7 +9636,7 @@ arch_preboot_os:	e12fff1e 	bx	lr
 43e03510:	eb00804d 	bl	0x43e2364c
 43e03514:	e1a0b000 	mov	fp, r0	;; loadaddr
 43e03518:	e59f025c 	ldr	r0, [pc, #604]	; 0x43e0377c	;; bootfile
-43e0351c:	eb001367 	bl	0x43e082c0
+43e0351c:	eb001367 	bl	<getenv>
 43e03520:	e1a05000 	mov	r5, r0	;; bootfile
 43e03524:	e3a09000 	mov	r9, #0
 43e03528:	ea000011 	b	0x43e03574
@@ -14599,7 +14604,7 @@ arch_preboot_os:	e12fff1e 	bx	lr
 43e082b4:	e1a00004 	mov	r0, r4
 43e082b8:	e8bd8ef0 	pop	{r4, r5, r6, r7, r9, sl, fp, pc}
 43e082bc:	43e31fa9 	mvnmi	r1, #676	; 0x2a4
-43e082c0:	e92d4010 	push	{r4, lr}
+getenv:	e92d4010 	push	{r4, lr}
 43e082c4:	e24dd018 	sub	sp, sp, #24
 43e082c8:	e5984004 	ldr	r4, [r8, #4]
 43e082cc:	e2144080 	ands	r4, r4, #128	; 0x80
@@ -14629,7 +14634,7 @@ arch_preboot_os:	e12fff1e 	bx	lr
 43e0832c:	e92d4038 	push	{r3, r4, r5, lr}
 43e08330:	e1a04001 	mov	r4, r1
 43e08334:	e1a05002 	mov	r5, r2
-43e08338:	ebffffe0 	bl	0x43e082c0
+43e08338:	ebffffe0 	bl	<getenv>
 43e0833c:	e3500000 	cmp	r0, #0
 43e08340:	0a000003 	beq	0x43e08354
 43e08344:	e3a01000 	mov	r1, #0
@@ -17696,7 +17701,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0b310:	e5867000 	str	r7, [r6]
 43e0b314:	e8bd8ef0 	pop	{r4, r5, r6, r7, r9, sl, fp, pc}
 43e0b318:	e92d4008 	push	{r3, lr}
-43e0b31c:	ebfff3e7 	bl	0x43e082c0
+43e0b31c:	ebfff3e7 	bl	<getenv>
 43e0b320:	e3500000 	cmp	r0, #0
 43e0b324:	0a000003 	beq	0x43e0b338
 43e0b328:	e5d00000 	ldrb	r0, [r0]
@@ -17707,7 +17712,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0b33c:	e8bd8008 	pop	{r3, pc}
 43e0b340:	e92d4008 	push	{r3, lr}
 43e0b344:	e59f0020 	ldr	r0, [pc, #32]	; 0x43e0b36c	;; bootm_low
-43e0b348:	ebfff3dc 	bl	0x43e082c0
+43e0b348:	ebfff3dc 	bl	<getenv>
 43e0b34c:	e3500000 	cmp	r0, #0
 43e0b350:	0a000003 	beq	0x43e0b364
 43e0b354:	e3a01000 	mov	r1, #0
@@ -17719,7 +17724,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0b36c:	43e32c7b 	mvnmi	r2, #31488	; 0x7b00
 43e0b370:	e92d4010 	push	{r4, lr}
 43e0b374:	e59f0048 	ldr	r0, [pc, #72]	; 0x43e0b3c4	;; bootm_size
-43e0b378:	ebfff3d0 	bl	0x43e082c0
+43e0b378:	ebfff3d0 	bl	<getenv>
 43e0b37c:	e2504000 	subs	r4, r0, #0
 43e0b380:	0a000003 	beq	0x43e0b394
 43e0b384:	e3a02010 	mov	r2, #16
@@ -17727,7 +17732,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0b38c:	eb00611e 	bl	0x43e2380c
 43e0b390:	e8bd8010 	pop	{r4, pc}
 43e0b394:	e59f002c 	ldr	r0, [pc, #44]	; 0x43e0b3c8	;; bootm_low
-43e0b398:	ebfff3c8 	bl	0x43e082c0
+43e0b398:	ebfff3c8 	bl	<getenv>
 43e0b39c:	e2503000 	subs	r3, r0, #0
 43e0b3a0:	01a00003 	moveq	r0, r3
 43e0b3a4:	0a000002 	beq	0x43e0b3b4
@@ -17742,7 +17747,7 @@ printf:	e92d000f 	push	{r0, r1, r2, r3}
 43e0b3c8:	43e32c7b 	mvnmi	r2, #31488	; 0x7b00
 43e0b3cc:	e92d4008 	push	{r3, lr}
 43e0b3d0:	e59f0020 	ldr	r0, [pc, #32]	; 0x43e0b3f8	;; bootm_mapsize
-43e0b3d4:	ebfff3b9 	bl	0x43e082c0
+43e0b3d4:	ebfff3b9 	bl	<getenv>
 43e0b3d8:	e3500000 	cmp	r0, #0
 43e0b3dc:	0a000003 	beq	0x43e0b3f0
 43e0b3e0:	e3a02010 	mov	r2, #16
@@ -18036,7 +18041,7 @@ boot_get_ramdisk:	e92d4ef3 	push	{r0, r1, r4, r5, r6, r7, r9, sl, fp, lr}
 43e0b860:	e58d0004 	str	r0, [sp, #4]
 43e0b864:	ea000024 	b	0x43e0b8fc
 43e0b868:	e59f0100 	ldr	r0, [pc, #256]	; 0x43e0b970	;; rootfslen
-43e0b86c:	ebfff293 	bl	0x43e082c0
+43e0b86c:	ebfff293 	bl	<getenv>
 43e0b870:	e2504000 	subs	r4, r0, #0
 43e0b874:	0a000009 	beq	0x43e0b8a0
 43e0b878:	e1a01007 	mov	r1, r7
@@ -18111,7 +18116,7 @@ boot_get_ramdisk:	e92d4ef3 	push	{r0, r1, r4, r5, r6, r7, r9, sl, fp, lr}
 43e0b98c:	e1a04001 	mov	r4, r1
 43e0b990:	e1a06002 	mov	r6, r2
 43e0b994:	e59d9020 	ldr	r9, [sp, #32]
-43e0b998:	ebfff248 	bl	0x43e082c0
+43e0b998:	ebfff248 	bl	<getenv>
 43e0b99c:	e3500000 	cmp	r0, #0
 43e0b9a0:	03a07001 	moveq	r7, #1
 43e0b9a4:	03e03000 	mvneq	r3, #0
@@ -19025,7 +19030,7 @@ boot_get_ramdisk:	e92d4ef3 	push	{r0, r1, r4, r5, r6, r7, r9, sl, fp, lr}
 43e0c7d4:	e3a01000 	mov	r1, #0
 43e0c7d8:	e5421100 	strb	r1, [r2, #-256]	; 0xffffff00
 43e0c7dc:	e58d3000 	str	r3, [sp]
-43e0c7e0:	ebffeeb6 	bl	0x43e082c0
+43e0c7e0:	ebffeeb6 	bl	<getenv>
 43e0c7e4:	e59d3000 	ldr	r3, [sp]
 43e0c7e8:	e2501000 	subs	r1, r0, #0
 43e0c7ec:	1a000002 	bne	0x43e0c7fc
@@ -19097,7 +19102,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0c8f4:	e8bd8008 	pop	{r3, pc}
 43e0c8f8:	e92d4070 	push	{r4, r5, r6, lr}
 43e0c8fc:	e59f013c 	ldr	r0, [pc, #316]	; 0x43e0ca40	;; bootdelay
-43e0c900:	ebffee6e 	bl	0x43e082c0
+43e0c900:	ebffee6e 	bl	<getenv>
 43e0c904:	e3500000 	cmp	r0, #0
 43e0c908:	03a04001 	moveq	r4, #1
 43e0c90c:	0a000003 	beq	0x43e0c920
@@ -19106,7 +19111,7 @@ run_command:	e92d4008 	push	{r3, lr}
 43e0c918:	eb005b94 	bl	0x43e23770
 43e0c91c:	e1a04000 	mov	r4, r0	;; bootdelay
 43e0c920:	e59f011c 	ldr	r0, [pc, #284]	; 0x43e0ca44	;; bootcmd
-43e0c924:	ebffee65 	bl	0x43e082c0
+43e0c924:	ebffee65 	bl	<getenv>
 43e0c928:	e2903000 	adds	r3, r0, #0
 43e0c92c:	e1a06000 	mov	r6, r0	;; bootcmd
 43e0c930:	13a03001 	movne	r3, #1
@@ -22968,7 +22973,7 @@ usb_stop:	e92d4008 	push	{r3, lr}
 43e10564:	18bd8038 	popne	{r3, r4, r5, pc}
 43e10568:	e2844008 	add	r4, r4, #8
 43e1056c:	e59f002c 	ldr	r0, [pc, #44]	; 0x43e105a0	;; stdin
-43e10570:	ebffdf52 	bl	0x43e082c0
+43e10570:	ebffdf52 	bl	<getenv>
 43e10574:	e1a01004 	mov	r1, r4
 43e10578:	eb004840 	bl	0x43e22680
 43e1057c:	e3500000 	cmp	r0, #0
@@ -28866,7 +28871,7 @@ find_mmc_device:	e92d4008 	push	{r3, lr}
 43e16180:	e58431dc 	str	r3, [r4, #476]	; 0x1dc
 43e16184:	e59f30fc 	ldr	r3, [pc, #252]	; 0x43e16288	;; smdk
 43e16188:	e58431e0 	str	r3, [r4, #480]	; 0x1e0
-43e1618c:	ebffc84b 	bl	0x43e082c0
+43e1618c:	ebffc84b 	bl	<getenv>
 43e16190:	e2507000 	subs	r7, r0, #0
 43e16194:	1a000004 	bne	0x43e161ac
 43e16198:	e59f30ec 	ldr	r3, [pc, #236]	; 0x43e1628c	;; SLSI0123
@@ -46661,6 +46666,7 @@ sprintf:	e92d000e 	push	{r1, r2, r3}
 43e27774:	43e35a46 	mvnmi	r5, #286720	; 0x46000
 43e27778:	43e2eecd 	mvnmi	lr, #3280	; 0xcd0
 43e2777c:	43e35a5f 	mvnmi	r5, #389120	; 0x5f000
+
 43e27780:	e92d4030 	push	{r4, r5, lr}
 43e27784:	e24ddb01 	sub	sp, sp, #1024	; 0x400
 43e27788:	e24dd004 	sub	sp, sp, #4
@@ -46704,51 +46710,51 @@ sprintf:	e92d000e 	push	{r1, r2, r3}
 43e2781c:	e92d4070 	push	{r4, r5, r6, lr}
 43e27820:	e5934000 	ldr	r4, [r3]						;; r4 = [r3]
 43e27824:	e3540000 	cmp	r4, #0							;; r4 cmp 0
-43e27828:	1a00002a 	bne	0x43e278d8
+43e27828:	1a00002a 	bne	0x43e278d8						;; if (initialized)
 43e2782c:	e3a02001 	mov	r2, #1
 43e27830:	e3a00305 	mov	r0, #335544320	; 0x14000000
-43e27834:	e5832000 	str	r2, [r3]
+43e27834:	e5832000 	str	r2, [r3]						;; initialized = 1
 43e27838:	e3a01004 	mov	r1, #4
-43e2783c:	e1a02004 	mov	r2, r4
-43e27840:	ebffa1ab 	bl	0x43e0fef4
+43e2783c:	e1a02004 	mov	r2, r4							;; r2 = r4 = 0
+43e27840:	ebffa1ab 	bl	0x43e0fef4						;; (0x14000000, 4, 0)
 43e27844:	e1a01004 	mov	r1, r4
 43e27848:	e1a02004 	mov	r2, r4
 43e2784c:	e3a00305 	mov	r0, #335544320	; 0x14000000
-43e27850:	ebffa1a7 	bl	0x43e0fef4
+43e27850:	ebffa1a7 	bl	0x43e0fef4						;; (0x14000000, 0, 0)
 43e27854:	e1a02004 	mov	r2, r4
 43e27858:	e1a01004 	mov	r1, r4
 43e2785c:	e59f0080 	ldr	r0, [pc, #128]	; 0x43e278e4
-43e27860:	ebffa1a3 	bl	0x43e0fef4
+43e27860:	ebffa1a3 	bl	0x43e0fef4						;; (0x140000a0, 0, 0)
 43e27864:	e3a00305 	mov	r0, #335544320	; 0x14000000
 43e27868:	e3a01004 	mov	r1, #4
-43e2786c:	ebffa190 	bl	0x43e0feb4
+43e2786c:	ebffa190 	bl	0x43e0feb4						;; (0x14000000, 4, ?)
 43e27870:	e1a01004 	mov	r1, r4
 43e27874:	e3a00305 	mov	r0, #335544320	; 0x14000000
-43e27878:	ebffa18d 	bl	0x43e0feb4
+43e27878:	ebffa18d 	bl	0x43e0feb4						;; (0x14000000, 0, ?)
 43e2787c:	e1a01004 	mov	r1, r4
 43e27880:	e59f005c 	ldr	r0, [pc, #92]	; 0x43e278e4
-43e27884:	ebffa18a 	bl	0x43e0feb4
+43e27884:	ebffa18a 	bl	0x43e0feb4						;; (0x140000a0, 0, ?)
 43e27888:	e3a00064 	mov	r0, #100	; 0x64
-43e2788c:	ebffed02 	bl	<udelay>
+43e2788c:	ebffed02 	bl	<udelay>						;; udelay(100)
 43e27890:	e3a01004 	mov	r1, #4
 43e27894:	e3a00305 	mov	r0, #335544320	; 0x14000000
-43e27898:	ebffa18f 	bl	0x43e0fedc
+43e27898:	ebffa18f 	bl	0x43e0fedc						;; x(0x14000000, 4)
 43e2789c:	e1a01004 	mov	r1, r4
 43e278a0:	e1a05000 	mov	r5, r0
 43e278a4:	e3a00305 	mov	r0, #335544320	; 0x14000000
-43e278a8:	ebffa18b 	bl	0x43e0fedc
+43e278a8:	ebffa18b 	bl	0x43e0fedc						;; x(0x14000000, 0, xx)
 43e278ac:	e1a01004 	mov	r1, r4
 43e278b0:	e59f4030 	ldr	r4, [pc, #48]	; 0x43e278e8
 43e278b4:	e1a06000 	mov	r6, r0
 43e278b8:	e59f0024 	ldr	r0, [pc, #36]	; 0x43e278e4
-43e278bc:	ebffa186 	bl	0x43e0fedc
+43e278bc:	ebffa186 	bl	0x43e0fedc						;; x(0x140000a0, 0)
 43e278c0:	e1a06086 	lsl	r6, r6, #1
 43e278c4:	e1866100 	orr	r6, r6, r0, lsl #2
 43e278c8:	e1865005 	orr	r5, r6, r5
-43e278cc:	e5c45155 	strb	r5, [r4, #341]	; 0x155
-43e278d0:	ebffffaa 	bl	0x43e27780
-43e278d4:	e5c40154 	strb	r0, [r4, #340]	; 0x154
-43e278d8:	e59f0008 	ldr	r0, [pc, #8]	; 0x43e278e8		;; r0 = 0x43e36714, the reason
+43e278cc:	e5c45155 	strb	r5, [r4, #341]	; 0x155		;; 341, board_version, ID1-3 GPIO pin
+43e278d0:	ebffffaa 	bl	0x43e27780						;; PATCH THIS TO: mov r0, 1, '0100a0e3'
+43e278d4:	e5c40154 	strb	r0, [r4, #340]	; 0x154		;; 340, not_signed_check
+43e278d8:	e59f0008 	ldr	r0, [pc, #8]	; 0x43e278e8	;; r0 = struct bootinfo *
 43e278dc:	e8bd8070 	pop	{r4, r5, r6, pc}
 43e278e0:	43f74b5c 	mvnsmi	r4, #92, 22	; 0x17000
 43e278e4:	140000a0 	strne	r0, [r0], #-160	; 0xffffff60

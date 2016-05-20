@@ -32,6 +32,20 @@ t() {
 }
 
 # prepare uboot
+#
+# This will produce many files from $img_bootloader
+#
+# 1. bl1_[0-5]
+# 2. bl2_[0-5]
+# 3. uboot_[0-5]
+# 4. tzsw_[0-5]
+# 5. uboot_[0-5].ss, 'strings' output
+# 6. uboot_[0-5].s, 'strings -x' output
+# 7. uboot_[0-5].asm, 'objdump' output
+# 8. md5sum, md5sum output of files in 1,2,3,4
+# 9. diff-uboot-{01,02,12}.ss.patch
+#
+# Those 3 diff output will be the most interesting ones at first glance
 puboot() {
 	local i
 	local f

@@ -1,0 +1,87 @@
+--- uboot_1.ss	2016-05-20 20:54:21.079493217 +0800
++++ uboot_2.ss	2016-05-20 20:54:21.459493336 +0800
+@@ -1,8 +1,8 @@
+ CxV4
+ C8@-
+ C8@-
++Cp@-
+ ;p@-
+-AT|n
+ BTp@-
+ Cp@-
+ Cs@-
+@@ -79,7 +79,7 @@ P@2	`
+ Cp@-
+ Cdo_env_import
+ do_env_export
+-U-Boot 2012.07-ged6d281 (Apr 11 2014 - 09:27:23) for M35X-W oversea
++U-Boot 2012.07-ged6d281 (Apr 11 2014 - 09:27:16) for M35X-W release
+ bootargs=
+ bootcmd=movi read kernel 0 40008000;movi read rootfs 0 42000000 500000;bootz 40008000 42000000
+ bootdelay=1
+@@ -214,6 +214,17 @@ environment
+ kernel
+ logo
+ param
++signature check disabled, bootloader had been unlocked
++emmc open 0
++movi r z f 0 0x%x
++emmc close 0
++Integrity check fail(0x%X).
++Kernel Integrity check fail
++System Halt....
++Kernel Integrity check success.
++rootfs Integrity check fail
++System Halt....
++rootfs Integrity check success.
+ CPU: %s%x Rev%x.%x [Samsung SOC on SMP Platform Base on ARM CortexA%d]
+ Exynos
+ APLL = %ldMHz, KPLL = %ldMHz
+@@ -444,9 +455,7 @@ ERROR: bad %s image!
+ %s check signature failed!
+ Recovery Kernel check signature failed!
+ Recovery Ramdisk check signature failed!
+-emmc open 0
+ mmc write 0 0x%x 0x%llx 0x%x
+-emmc close 0
+ flashing '%s' failed
+ FAILfailed to flash partition
+ INFOunknown OEM command
+@@ -512,17 +521,12 @@ Recovery Kernel Integrity check fail
+ Recovery Ramdisk Integrity check fail
+ movi write recovery 0 0x50000000
+ insdroid recovery complete!
+-mmc write 0 50000000 %x %x
+-insdroid system complete!
+-insdroid userdata complete!
+ insdroid
+ Android sub-system
+ insdroid uboot    - Install uboot image for Android
+ insdroid kernel   - Install kernel image for Android
+ insdroid ramdisk  - Install ramdisk image for Android
+ insdroid recovery - Install recovery image for Android
+-insdroid system   - Install system image for Android
+-insdroid userdata - Install userdata image for Android
+ CRC32 for %08lx ... %08lx ==> %08lx
+ Base Address: 0x%08lx
+ Tested %d iteration(s) with %lu errors.
+@@ -600,6 +604,7 @@ read
+ write
+ erase
+ MMC %s: dev # %d, block # %d, count %d ... 
++Can't write mmc without signature check!
+ user
+ Default erase user partition
+ Block count is Too BIG!!
+@@ -1353,8 +1358,7 @@ ramdisk
+ system
+ cache
+ userdata
+-U-Boot 2012.07-ged6d281 (Apr 11 2014) for M35X-W oversea
+-oversea
++U-Boot 2012.07-ged6d281 (Apr 11 2014) for M35X-W release
++user
+ ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ%
+-LkSug7
+-IL}q
++L$@q

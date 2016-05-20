@@ -1,0 +1,139 @@
+--- uboot_0.ss	2016-05-20 20:54:20.687493092 +0800
++++ uboot_1.ss	2016-05-20 20:54:21.079493217 +0800
+@@ -2,10 +2,10 @@ CxV4
+ C8@-
+ C8@-
+ ;p@-
++AT|n
+ BTp@-
+ Cp@-
+ Cs@-
+-Cp@-
+ C0@-
+ Cp@-
+ C!Ce
+@@ -40,8 +40,6 @@ Cp@-
+ C8@-
+ @l \@
+ C8@-
+-Cp@-
+-C8@-
+ C8@-
+ Cp@-
+ Cp@-
+@@ -79,10 +77,9 @@ P@2	`
+ @@2	p
+ :	pd
+ Cp@-
+-Cdo_msdfuse
+-do_env_import
++Cdo_env_import
+ do_env_export
+-U-Boot 2012.07-gf776667 (Apr 15 2014 - 16:33:03) for M35X-W eng
++U-Boot 2012.07-ged6d281 (Apr 11 2014 - 09:27:23) for M35X-W oversea
+ bootargs=
+ bootcmd=movi read kernel 0 40008000;movi read rootfs 0 42000000 500000;bootz 40008000 42000000
+ bootdelay=1
+@@ -468,9 +465,6 @@ usage : fatformat <interface> <dev[:part
+ Start format MMC%d partition%d ...
+ usage: fatinfo <interface> <dev[:part]>
+ ** Unable to use %s %d:%d for fatinfo **
+-** Unable to use %s %d:%d for fatwrite **
+-** Unable to write "%s" from %s %d:%d **
+-%ld bytes written
+ usage: fatls <interface> <dev[:part]> [directory]
+ ** Unable to use %s %d:%d for fatls **
+ No Fat FS detected
+@@ -482,11 +476,6 @@ fatformat
+ disk format by FAT32
+ <interface(only support mmc)> <dev:partition num>
+ 	- format by FAT32 on 'interface'
+-fatwrite
+-write file into a dos filesystem
+-<interface> <dev[:part]> <addr> <filename> <bytes>
+-    - write file 'filename' from the address 'addr' in RAM
+-      to 'dev' on 'interface'
+ fatinfo
+ print information about filesystem
+ <interface> <dev[:part]>
+@@ -503,12 +492,6 @@ print command description/usage
+ 	- print brief description of all commands
+ help command ...
+ 	- print detailed usage of 'command'
+-Fuse %s from SD card to eMMC %s partition
+-fatload mmc 1:1 0x%x %s
+-Fail to get file size!
+-partition size=%lld, image size=%d
+-mmc write 0 0x%x 0x%x 0x%x
+-Fuse %s complete!
+ dnw 0x%X
+ insdroid has been cancelled!
+ ERROR: %s image size too large!(size = 0x%X, max = 0x%X)
+@@ -532,10 +515,6 @@ insdroid recovery complete!
+ mmc write 0 50000000 %x %x
+ insdroid system complete!
+ insdroid userdata complete!
+-sdfuse_img
+-fuse image from SD card to eMMC.
+-<system|userdata> <filename>
+-	 - Fuse <filename> image(compressed ext4 or raw) from SD card to eMMC <system|userdata> partition.
+ insdroid
+ Android sub-system
+ insdroid uboot    - Install uboot image for Android
+@@ -544,11 +523,6 @@ insdroid ramdisk  - Install ramdisk imag
+ insdroid recovery - Install recovery image for Android
+ insdroid system   - Install system image for Android
+ insdroid userdata - Install userdata image for Android
+-fatload mmc 1:1 0x48000000 cmdfuse.txt
+-===== cmd %s
+-%s finished
+-msdfuse
+-msdfuse sub-system
+ CRC32 for %08lx ... %08lx ==> %08lx
+ Base Address: 0x%08lx
+ Tested %d iteration(s) with %lu errors.
+@@ -623,6 +597,7 @@ switch to partions #%d, %s
+ mmc%d is current device
+ mmc%d(part %d) is current device
+ read
++write
+ erase
+ MMC %s: dev # %d, block # %d, count %d ... 
+ user
+@@ -1187,15 +1162,6 @@ FAT32
+ FAT12   
+ FAT16   
+ Invalid FAT entry
+-error: overflow occurs
+-error: wrinting directory entry
+-Error: reading directory block
+-Error: %ld overflow
+-Error: clearing FAT entries
+-Error: writing contents
+-Error: flush fat buffer
+-Error: writing directory entry
+-Error: finding empty cluster
+ ** Partition %d not valid on device %d **
+ SAMSUNG
+ NO NAME 
+@@ -1231,7 +1197,6 @@ Unknown
+ No valid FAT fs found
+ Partition %d: Filesystem: %s "%s"
+ reading %s
+-writing %s
+ Can't list files without a filesystem!
+ %s/%s
+ Can't load file without a filesystem!
+@@ -1388,8 +1353,8 @@ ramdisk
+ system
+ cache
+ userdata
+-U-Boot 2012.07-gf776667 (Apr 15 2014) for M35X-W eng
++U-Boot 2012.07-ged6d281 (Apr 11 2014) for M35X-W oversea
++oversea
+ ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ%
+-S&18
+-z7G{
+-1i(3
++LkSug7
++IL}q

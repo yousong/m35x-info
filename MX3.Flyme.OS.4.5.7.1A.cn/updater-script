@@ -1,0 +1,58 @@
+getprop("ro.product.device") == "mx3" || abort("This package is for \"mx3\" devices; this is a \"" + getprop("ro.product.device") + "\".");
+package_extract_file("META-INF/machine_match", "/tmp/machine_match");
+set_perm(0, 0, 0755, "/tmp/machine_match");
+package_extract_file("META-INF/imei.dat", "/tmp/imei.dat");
+if (run_program("/tmp/machine_match", "/tmp/imei.dat") != "0") then
+	ui_print("machine not match");
+	delete(/tmp/imei.dat);
+	abort();
+endif;
+delete(/tmp/imei.dat);
+if (less_than_int(cat_file("/sys/block/mmcblk0/mmcblk0p1/size"), "3145728")) then
+	if (access("/cache/command") != "0") then
+		show_progress(0.500000, 1);
+		ui_print("update recovery...");
+		package_extract_file("recovery-uboot.img", "/dev/block/mmcblk0p7");
+		package_extract_file("META-INF/command-upgrade", "/cache/recovery/command");
+		package_extract_file("META-INF/command-upgrade", "/cache/command");
+		show_progress(0.500000, 1);
+	else
+		delete("/cache/command");
+		package_extract_file("META-INF/command-partition", "/cache/recovery/command");
+		show_progress(1.000000, 1);
+	endif;
+	set_progress(1.000000);
+	sleep(1);
+	reboot_now("/dev/block/mmcblk0p10", "recovery");
+else
+	ui_print("update recovery...");
+	package_extract_file("recovery-uboot.img", "/dev/block/mmcblk0p7");
+	ui_print("update ramdisk...");
+	package_extract_file("ramdisk-uboot.img", "/dev/block/mmcblk0p6");
+	ui_print("update kernel...");
+	package_extract_file("zImage", "/dev/block/mmcblk0p5");
+	ui_print("update bootloader...");
+	package_extract_file("bootloader.img", "/tmp/bootloader.img");
+	write_raw_image("/tmp/bootloader.img", "/dev/block/mmcblk0boot0");
+	delete("/tmp/bootloader.img");
+	show_progress(0.750000, 0);
+	ui_print("update system...");
+	block_image_update("/dev/block/mmcblk0p1", package_extract_file("system.transfer.list"), "system.new.dat", "system.patch.dat");
+	show_progress(0.050000, 5);
+	ui_print("update custom...");
+	show_progress(0.050000, 5);
+	ui_print("Mount custom partition");
+	if (mount("ext4", "EMMC", "/dev/block/mmcblk0p4", "/custom")) then
+		if (access("/custom/simlock.key") != "0") then
+			ui_print("Delete /custom/meizu directory...");
+			delete_recursive("/custom/meizu");
+		endif;
+		ui_print("Delete /custom/3rd-party directory...");
+		delete_recursive("/custom/3rd-party");
+		package_extract_dir("custom", "/custom");
+		ui_print("set_perm_recursive custom");
+		set_perm_recursive(0, 0, 0555, 0555, "/custom");
+		unmount("/custom");
+	endif;
+	show_progress(0.200000, 10);
+endif;

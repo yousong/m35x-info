@@ -118,4 +118,24 @@ xuramdisk() {
 	gzip -dc "../$fout" | cpio -i
 }
 
+# unzip FILE.zip to FILE/
+unzipd() {
+	local name="$1"
+	local dir=${name%.zip}
+
+	if [ "$dir" = "$name" ]; then
+		echo "arg1 is expected to be a filename with .zip suffix" >&2
+		return 1
+	fi
+
+	if [ -d "$dir" ]; then
+		echo "$dir already exists" >&2
+		return 2
+	fi
+
+	mkdir -p "$dir"
+	cd "$dir"
+	unzip "../$name"
+}
+
 "$@"

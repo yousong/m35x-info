@@ -80,7 +80,7 @@ class Inst(object):
     def __init__(self, line):
         self.line = line.rstrip()
         line = line.lstrip()
-        selGf.is_inst = self._parse(line)
+        self.is_inst = self._parse(line)
 
     def _parse(self, line):
         if ';' in line:

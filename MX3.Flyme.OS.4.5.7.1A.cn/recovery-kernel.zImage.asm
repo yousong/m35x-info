@@ -515,6 +515,7 @@ Disassembly of section .data:
      7f4:	00007fff 			; <UNDEFINED> instruction: 0x00007fff
      7f8:	e320f000 	msr	CPSR_, #0
      7fc:	e320f000 	msr	CPSR_, #0
+
      800:	e1a0c00d 	mov	ip, sp
      804:	e92dd8f0 	push	{r4, r5, r6, r7, fp, ip, lr, pc}
      808:	e24cb004 	sub	fp, ip, #4
@@ -600,16 +601,17 @@ Disassembly of section .data:
      948:	e92dd800 	push	{fp, ip, lr, pc}
      94c:	e24cb004 	sub	fp, ip, #4
      950:	e59f0008 	ldr	r0, [pc, #8]	; 0x960
-     954:	e08f0000 	add	r0, pc, r0
+     954:	e08f0000 	add	r0, pc, r0	;; Attempting division by 0!
      958:	ebffffea 	bl	0x908
      95c:	e89da800 	ldm	sp, {fp, sp, pc}
      960:	00001070 	andeq	r1, r0, r0, ror r0
+
      964:	e1a0c00d 	mov	ip, sp
      968:	e92dd830 	push	{r4, r5, fp, ip, lr, pc}
      96c:	e24cb004 	sub	fp, ip, #4
-     970:	e59f40f4 	ldr	r4, [pc, #244]	; 0xa6c
+     970:	e59f40f4 	ldr	r4, [pc, #244]	; 0xa6c	;; r4 = 0x00211c80
      974:	e59fc0f4 	ldr	ip, [pc, #244]	; 0xa70
-     978:	e08f4004 	add	r4, pc, r4
+     978:	e08f4004 	add	r4, pc, r4	;; r4 = 0x212600
      97c:	e794500c 	ldr	r5, [r4, ip]
      980:	e3a0c201 	mov	ip, #268435456	; 0x10000000
      984:	e59cc000 	ldr	ip, [ip]
@@ -641,7 +643,7 @@ Disassembly of section .data:
      9ec:	e3a028ff 	mov	r2, #16711680	; 0xff0000
      9f0:	e59f008c 	ldr	r0, [pc, #140]	; 0xa84
      9f4:	e7943003 	ldr	r3, [r4, r3]
-     9f8:	e08f0000 	add	r0, pc, r0
+     9f8:	e08f0000 	add	r0, pc, r0	;; Uncompressing Linux...
      9fc:	e583c000 	str	ip, [r3]
      a00:	e59f3080 	ldr	r3, [pc, #128]	; 0xa88
      a04:	e7943003 	ldr	r3, [r4, r3]
@@ -651,23 +653,30 @@ Disassembly of section .data:
      a14:	e7943003 	ldr	r3, [r4, r3]
      a18:	e5832000 	str	r2, [r3]
      a1c:	ebffff77 	bl	0x800
-     a20:	e59f3068 	ldr	r3, [pc, #104]	; 0xa90
-     a24:	e59f2068 	ldr	r2, [pc, #104]	; 0xa94
-     a28:	e7940003 	ldr	r0, [r4, r3]
-     a2c:	e59f3064 	ldr	r3, [pc, #100]	; 0xa98
-     a30:	e7941002 	ldr	r1, [r4, r2]
+     a20:	e59f3068 	ldr	r3, [pc, #104]	; 0xa90	;; r3 = 0xfffffff4
+     a24:	e59f2068 	ldr	r2, [pc, #104]	; 0xa94	;; r2 = 0xfffffff8
+     a28:	e7940003 	ldr	r0, [r4, r3]	;; r0 = [0x2125f4] = 0x1afc
+     a2c:	e59f3064 	ldr	r3, [pc, #100]	; 0xa98	;; r3 = 0xfffffffc
+     a30:	e7941002 	ldr	r1, [r4, r2]	;; r1 = [0x2125f8] = 0x2125d5
      a34:	e5952000 	ldr	r2, [r5]
      a38:	e7943003 	ldr	r3, [r4, r3]
-     a3c:	e0601001 	rsb	r1, r0, r1
-     a40:	eb0001bd 	bl	0x113c
+     a3c:	e0601001 	rsb	r1, r0, r1		;; r1 = r1 - r0 = 0x210ad9
+;;
+;; the compressed image is stored at offset 0x1afc with size of 0x210ad9 bytes
+;; it's a lzo compressed image with byte sequence signature \x89LZO
+;;
+;;      dd if=recovery-kernel of=recovery-kernel.lzo skip=$((0x1afc)) bs=1 count=$((0x210ad9))
+;;      lzop -d -o recovery-kernel.bin recovery-kernel.lzo
+;;
+     a40:	eb0001bd 	bl	0x113c	;; do_decompress(in, in_end-in, ...)
      a44:	e3500000 	cmp	r0, #0
      a48:	1a000003 	bne	0xa5c
      a4c:	e59f0048 	ldr	r0, [pc, #72]	; 0xa9c
-     a50:	e08f0000 	add	r0, pc, r0
+     a50:	e08f0000 	add	r0, pc, r0	;; done, booting the kernel.
      a54:	ebffff69 	bl	0x800
      a58:	e89da830 	ldm	sp, {r4, r5, fp, sp, pc}
      a5c:	e59f003c 	ldr	r0, [pc, #60]	; 0xaa0
-     a60:	e08f0000 	add	r0, pc, r0
+     a60:	e08f0000 	add	r0, pc, r0	;; decompressor returned an error
      a64:	ebffffa7 	bl	0x908
      a68:	e89da830 	ldm	sp, {r4, r5, fp, sp, pc}
      a6c:	00211c80 	eoreq	r1, r1, r0, lsl #25
@@ -1106,6 +1115,7 @@ Disassembly of section .data:
     1130:	e1570001 	cmp	r7, r1
     1134:	03a00000 	moveq	r0, #0
     1138:	eaffff50 	b	0xe80
+
     113c:	e1a0c00d 	mov	ip, sp
     1140:	e92ddff0 	push	{r4, r5, r6, r7, r8, r9, sl, fp, ip, lr, pc}
     1144:	e24cb004 	sub	fp, ip, #4
@@ -1224,48 +1234,48 @@ Disassembly of section .data:
     1308:	e1a00005 	mov	r0, r5
     130c:	ea000003 	b	0x1320
     1310:	e59f00c8 	ldr	r0, [pc, #200]	; 0x13e0
-    1314:	e08f0000 	add	r0, pc, r0
+    1314:	e08f0000 	add	r0, pc, r0	;; invalid header
     1318:	e12fff39 	blx	r9
     131c:	e3e00000 	mvn	r0, #0
     1320:	e24bd028 	sub	sp, fp, #40	; 0x28
     1324:	e89daff0 	ldm	sp, {r4, r5, r6, r7, r8, r9, sl, fp, sp, pc}
     1328:	e59f00b4 	ldr	r0, [pc, #180]	; 0x13e4
-    132c:	e08f0000 	add	r0, pc, r0
+    132c:	e08f0000 	add	r0, pc, r0	;; Compressed data violation
     1330:	e12fff39 	blx	r9
     1334:	e3e00000 	mvn	r0, #0
     1338:	eafffff8 	b	0x1320
     133c:	e59f00a4 	ldr	r0, [pc, #164]	; 0x13e8
-    1340:	e08f0000 	add	r0, pc, r0
+    1340:	e08f0000 	add	r0, pc, r0	;; file corrupted
     1344:	e12fff39 	blx	r9
     1348:	e3e00000 	mvn	r0, #0
     134c:	eafffff3 	b	0x1320
     1350:	e59f0094 	ldr	r0, [pc, #148]	; 0x13ec
-    1354:	e08f0000 	add	r0, pc, r0
+    1354:	e08f0000 	add	r0, pc, r0	;; dest len longer than block size
     1358:	e12fff39 	blx	r9
     135c:	e3e00000 	mvn	r0, #0
     1360:	eaffffee 	b	0x1320
     1364:	e59f0084 	ldr	r0, [pc, #132]	; 0x13f0
-    1368:	e08f0000 	add	r0, pc, r0
+    1368:	e08f0000 	add	r0, pc, r0	;; file corrupted
     136c:	e12fff39 	blx	r9
     1370:	e3e00000 	mvn	r0, #0
     1374:	eaffffe9 	b	0x1320
     1378:	e59f0074 	ldr	r0, [pc, #116]	; 0x13f4
-    137c:	e08f0000 	add	r0, pc, r0
+    137c:	e08f0000 	add	r0, pc, r0	;; file corrupted
     1380:	e12fff39 	blx	r9
     1384:	e3e00000 	mvn	r0, #0
     1388:	eaffffe4 	b	0x1320
     138c:	e59f0064 	ldr	r0, [pc, #100]	; 0x13f8
-    1390:	e08f0000 	add	r0, pc, r0
+    1390:	e08f0000 	add	r0, pc, r0	;; file corrupted
     1394:	e12fff39 	blx	r9
     1398:	e3e00000 	mvn	r0, #0
     139c:	eaffffdf 	b	0x1320
     13a0:	e59f0054 	ldr	r0, [pc, #84]	; 0x13fc
-    13a4:	e08f0000 	add	r0, pc, r0
+    13a4:	e08f0000 	add	r0, pc, r0	;; NULL input pointer and missing fill function
     13a8:	e12fff33 	blx	r3
     13ac:	e3e00000 	mvn	r0, #0
     13b0:	eaffffda 	b	0x1320
     13b4:	e59f0044 	ldr	r0, [pc, #68]	; 0x1400
-    13b8:	e08f0000 	add	r0, pc, r0
+    13b8:	e08f0000 	add	r0, pc, r0	;; NULL output pointer and no flush function provided
     13bc:	e12fff33 	blx	r3
     13c0:	e3e00000 	mvn	r0, #0
     13c4:	eaffffd5 	b	0x1320

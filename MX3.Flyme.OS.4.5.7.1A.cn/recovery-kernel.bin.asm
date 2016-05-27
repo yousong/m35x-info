@@ -2,7 +2,7 @@ c00145ac:	e1a0c00d 	mov	ip, sp
 c00145b0:	e92dddf0 	push	{r4, r5, r6, r7, r8, sl, fp, ip, lr, pc}
 c00145b4:	e24cb004 	sub	fp, ip, #4
 c00145b8:	e24dd088 	sub	sp, sp, #136	; 0x88
-c00145bc:	e1a02840 	asr	r2, r0, #16
+c00145bc:	e1a02840 	asr	r2, r0, #16		;; r0 = no
 c00145c0:	e59f554c 	ldr	r5, [pc, #1356]	; 0xc0014b14
 c00145c4:	e352000f 	cmp	r2, #15
 c00145c8:	e1a03000 	mov	r3, r0
@@ -14,7 +14,7 @@ c00145dc:	e6ff1070 	uxth	r1, r0
 c00145e0:	e3510069 	cmp	r1, #105	; 0x69
 c00145e4:	908ff101 	addls	pc, pc, r1, lsl #2
 c00145e8:	ea00012e 	b	0xc0014aa8
-c00145ec:	ea00011d 	b	0xc0014a68
+c00145ec:	ea00011d 	b	0xc0014a68		;; 0
 c00145f0:	ea00010d 	b	0xc0014a2c
 c00145f4:	ea0000e1 	b	0xc0014980
 c00145f8:	ea0000d6 	b	0xc0014958
@@ -116,7 +116,7 @@ c0014774:	ea0000cb 	b	0xc0014aa8
 c0014778:	ea0000ca 	b	0xc0014aa8
 c001477c:	ea0000c9 	b	0xc0014aa8
 c0014780:	ea00004f 	b	0xc00148c4
-c0014784:	ea00003b 	b	0xc0014878
+c0014784:	ea00003b 	b	0xc0014878		;; 0x66
 c0014788:	ea000020 	b	0xc0014810
 c001478c:	ea000009 	b	0xc00147b8
 c0014790:	ea000004 	b	0xc00147a8
@@ -129,6 +129,7 @@ c00147a8:	e5960000 	ldr	r0, [r6]
 c00147ac:	ebfff9b5 	bl	0xc0012e88
 c00147b0:	e1a04000 	mov	r4, r0
 c00147b4:	eafffff8 	b	0xc001479c
+
 c00147b8:	e59f0358 	ldr	r0, [pc, #856]	; 0xc0014b18
 c00147bc:	e5965000 	ldr	r5, [r6]
 c00147c0:	e08f0000 	add	r0, pc, r0
@@ -172,14 +173,18 @@ c0014854:	eb003d85 	bl	0xc0023e70
 c0014858:	e3500000 	cmp	r0, #0
 c001485c:	01a04000 	moveq	r4, r0
 c0014860:	13e0400d 	mvnne	r4, #13
+
 c0014864:	e59f02b8 	ldr	r0, [pc, #696]	; 0xc0014b24
 c0014868:	e08f0000 	add	r0, pc, r0
 c001486c:	e2800008 	add	r0, r0, #8
 c0014870:	eb0a5c61 	bl	0xc02ab9fc
 c0014874:	eaffffc8 	b	0xc001479c
+
 c0014878:	e1a0200d 	mov	r2, sp
 c001487c:	e3c23d7f 	bic	r3, r2, #8128	; 0x1fc0
+
 c0014880:	e3c3303f 	bic	r3, r3, #63	; 0x3f
+
 c0014884:	e5960000 	ldr	r0, [r6]
 c0014888:	e5933008 	ldr	r3, [r3, #8]
 c001488c:	e2902b01 	adds	r2, r0, #1024	; 0x400
@@ -190,8 +195,10 @@ c001489c:	13e0400d 	mvnne	r4, #13
 c00148a0:	1affffbd 	bne	0xc001479c
 c00148a4:	e59f127c 	ldr	r1, [pc, #636]	; 0xc0014b28
 c00148a8:	e3a02b01 	mov	r2, #1024	; 0x400
-c00148ac:	e08f1001 	add	r1, pc, r1
-c00148b0:	eb050262 	bl	0xc0155240
+c00148ac:	e08f1001 	add	r1, pc, r1	;; Ty$xCHOrCTZ2ERxW8TV+AflezItpJXE$ND6$Og2!vk+v+HVr~)IAxwR8dY=R_bqwN76uu9K$2cx7$(ZZg~iBALLf0B06P~oWk*3!(xb*CV3zXpLuDxsl99%nUhW#jlA5FrvkrC^j#VM3@qx9C@RM)DP=v@AvCy%V1bKrC^4U9hXPf%owk2MXGzRoyORe&AShnXZhNfq11Np@ztM3zUztI1n7~pIxYaYYRGjieX7l4OweRKyN!U9F$6Cs0aCAZH1!4+t5@NF@yW5EG_0rWdjDd$1+brHw1d36l*4cSbnn1FdwoZnof=wY6XSyO~i8U)aog_wDZ4f7_8u+zG@Gf(AEEQf_SIYmcfSfAflajrkgeRdY^HZyKmOKrMZIUt3XWbyH3t=hrCKty+7z=FKm7DToWvBWPr+Qp*PzZnvw=6^j*S&lD$5OB*b_LCRmo0iw*QDm17&YfuyI+W6qJ60L*fL9r3L6DNVLwP5kX30)C+*&&icbgDpC&^SBMkvF)FphohBLc3)p%Q2)1iDpOy)ri@ANL^YTrf~XmeDWTGxqW3UGiD2rwejnLzh1uPFrYZ^IO9NW4&d5Q8a!y0kQGau9JBnwC*DJ7j5eTS*&_Nq5VQOcl6mHwh=$ZEXQv6WZLMoq$vy5)(O3ly(AM0=%sl&14Nr@l_Vsi1*Qx0Z!KQ*CgTT&!S+wUuujlPq2ZgJXkudcSO%W)$8@qvLr=yHPiyNmpBj(NxNUufVhLK@%HXypup@uVu#3AsirH8zX*eC~JJyYG4&O&e&(&ubzf!#AGvhfM4yCQ^uI6AEA~xrTBzcb@0pD4xBBGbD~OVQ1^AgxIOf+ZJukBlG2jY~y&4RGEZHb6d)M+bpSZ0g6V_SBNo*13Ph2E8IEnTG4#e%WFesCN~)t5PLMZeNnP4a)9#*AORMd*)+NwRR^7IiSgeN3E3hC%F)OmYHHWB_aluSel3avdUTv7&@G++DE16bhJQD+Ro=)p!*oo~32ACe$Oqi)7x5W3P=uhvxtA6g1eN1g)Ad=za$%^7D
+c00148b0:	eb050262 	bl	0xc0155240	;; memcpy()
+										;; yeah, the above ascii code string (\0a is not present) is the key
+
 c00148b4:	e3500000 	cmp	r0, #0
 c00148b8:	01a04000 	moveq	r4, r0
 c00148bc:	13e0400d 	mvnne	r4, #13
@@ -218,7 +225,7 @@ c001490c:	e59f021c 	ldr	r0, [pc, #540]	; 0xc0014b30
 c0014910:	e1a01006 	mov	r1, r6
 c0014914:	e596403c 	ldr	r4, [r6, #60]	; 0x3c
 c0014918:	e3120020 	tst	r2, #32
-c001491c:	e08f0000 	add	r0, pc, r0
+c001491c:	e08f0000 	add	r0, pc, r0	;; Oops - bad syscall(2)
 c0014920:	e24b20a4 	sub	r2, fp, #164	; 0xa4
 c0014924:	03a0e004 	moveq	lr, #4
 c0014928:	13a0e002 	movne	lr, #2
@@ -305,7 +312,7 @@ c0014a68:	e59f00c8 	ldr	r0, [pc, #200]	; 0xc0014b38
 c0014a6c:	e3a04000 	mov	r4, #0
 c0014a70:	e1a01006 	mov	r1, r6
 c0014a74:	e24b20a4 	sub	r2, fp, #164	; 0xa4
-c0014a78:	e08f0000 	add	r0, pc, r0
+c0014a78:	e08f0000 	add	r0, pc, r0	;; branch through zero
 c0014a7c:	e1a03004 	mov	r3, r4
 c0014a80:	e3a0c00b 	mov	ip, #11
 c0014a84:	e50b40a0 	str	r4, [fp, #-160]	; 0xffffff60

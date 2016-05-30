@@ -27,7 +27,7 @@ def sysupgrade_check():
 	}
 
 	params = params_428
-	params['imei'] = '862845021199972'
+	params['imei'] = '0'
 	params['sn'] = ''
 
 	sys = json.dumps(params)
